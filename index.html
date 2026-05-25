@@ -73,6 +73,38 @@ button { font-family: inherit; }
 .examiner .speak-q { background: none; border: 1px solid var(--line2); color: var(--text1); border-radius: 7px; padding: 4px 10px; font-size: 11px; cursor: pointer; margin-top: 10px; display:inline-flex; align-items:center; gap:5px; }
 .examiner .speak-q:hover { border-color: var(--blue); color: var(--blue); }
 
+/* speaking guide */
+.guide { max-width:720px; margin:0 auto 16px; background: var(--bg2); border:1px solid var(--line); border-radius: var(--r); overflow:hidden; }
+.guide-head { padding:9px 14px; background: var(--gold-bg); border-bottom:1px solid rgba(212,168,67,0.2); font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold); display:flex; align-items:center; gap:7px; }
+.guide-body { padding: 4px 0; }
+.gstep { display:flex; gap:12px; padding:10px 16px; border-bottom:1px solid var(--line); }
+.gstep:last-child { border:none; }
+.gstep .gn { width:22px; height:22px; border-radius:50%; background:var(--bg3); border:1px solid var(--line2); color:var(--gold); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.gstep .gt { font-size:13px; font-weight:500; margin-bottom:3px; }
+.gstep .gp { font-size:12px; color:var(--text1); line-height:1.5; }
+.gstep .gp code { background:var(--gold-bg); color:var(--gold2); border-radius:4px; padding:1px 6px; font-family:inherit; cursor:pointer; }
+.gstep .gp code:hover { background:rgba(212,168,67,0.25); }
+
+/* phrase bank (categorized) */
+.cat { margin-bottom:18px; }
+.cat h4 { font-size:12px; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.cat h4 .badge { background:var(--gold-bg); color:var(--gold); border:1px solid rgba(212,168,67,0.3); border-radius:99px; font-size:10px; padding:1px 8px; }
+.pcard { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:9px 12px; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.pcard:hover { border-color:var(--line2); }
+.pcard .pe { font-size:13px; color:var(--text0); font-weight:500; }
+.pcard .pj { font-size:11px; color:var(--text2); margin-top:2px; }
+.pcard .pacts { display:flex; gap:6px; flex-shrink:0; }
+.pmini { background:var(--bg3); border:1px solid var(--line2); color:var(--text1); border-radius:6px; padding:4px 8px; font-size:11px; cursor:pointer; }
+.pmini:hover { border-color:var(--gold); color:var(--gold); }
+
+/* custom topic input */
+.custom-wrap { max-width:680px; margin:0 auto; }
+.custom-wrap label { font-size:12px; color:var(--text1); display:block; margin:14px 0 6px; }
+.custom-wrap input, .custom-wrap textarea { width:100%; background:var(--bg2); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:inherit; font-size:14px; padding:11px 14px; outline:none; }
+.custom-wrap input:focus, .custom-wrap textarea:focus { border-color:var(--gold); }
+.custom-wrap textarea { resize:vertical; min-height:80px; line-height:1.6; }
+.eg { font-size:11px; color:var(--text2); margin-top:6px; line-height:1.5; }
+
 /* repeat target */
 .repeat-target { background: var(--bg2); border:1px solid var(--line); border-radius: var(--r2); padding: 22px 24px; max-width: 720px; margin: 0 auto 18px; text-align:center; }
 .repeat-target .rt-sentence { font-size: 22px; line-height: 1.5; font-weight: 500; margin-bottom: 16px; }
@@ -179,6 +211,7 @@ button { font-family: inherit; }
     <div class="tabs">
       <div class="tab active" data-mode="repeat" onclick="setMode('repeat')"><span class="ic">🔁</span>Listen &amp; Repeat</div>
       <div class="tab" data-mode="interview" onclick="setMode('interview')"><span class="ic">🎤</span>Interview</div>
+      <div class="tab" data-mode="custom" onclick="setMode('custom')"><span class="ic">🎬</span>自由テーマ</div>
       <div class="tab" data-mode="phrases" onclick="setMode('phrases')"><span class="ic">💬</span>フレーズ &amp; 語彙</div>
     </div>
     <div class="top-stat"><span>単語帳</span><b id="top-vocab">0</b></div>
@@ -344,19 +377,96 @@ const REPEAT_LEVELS = [
     ]}
 ];
 
-const PHRASES = [
-  { en:"What really drew me to ~ was ...", ja:"〜に惹かれた一番の理由は…だった" },
-  { en:"What I enjoy about it is ...", ja:"それの好きなところは…" },
-  { en:"Plus, ... / Also, ...", ja:"さらに… / それに…（理由の追加）" },
-  { en:"First, ... Second, ... So, ...", ja:"列挙して結論に運ぶ黄金パターン" },
-  { en:"Overall, I think ...", ja:"全体として…だと思う（締め）" },
-  { en:"So, I believe / I definitely prefer ...", ja:"だから…だと思う / 断然…が好き" },
-  { en:"For example, ...", ja:"例えば…（具体例で説得力UP）" },
-  { en:"Even if / Even though ..., the ...", ja:"たとえ…でも、…（譲歩）" },
-  { en:"..., which can / helps / makes ...", ja:"関係詞で効果をスマートに追加" },
-  { en:"..., making it more ...", ja:"分詞構文で「それが〜にする」" },
-  { en:"Not only ... but also ...", ja:"それだけでなく…も" },
-  { en:"That's why I ...", ja:"そういうわけで私は…（締め）" }
+const PHRASE_BANK = [
+  { cat:'① 切り出し（Opening）', items:[
+    { en:"One ... I remember was ...", ja:"印象に残っている…は…でした" },
+    { en:"I'd love to talk about ...", ja:"…についてぜひ話したいです" },
+    { en:"Recently, I ...", ja:"最近、私は…した" },
+    { en:"Sure, ...", ja:"もちろん、…（自然な出だし）" },
+    { en:"What really drew me to ~ was ...", ja:"〜に惹かれた一番の理由は…でした" },
+    { en:"What I enjoy about it is ...", ja:"それの好きなところは…です" }
+  ]},
+  { cat:'② 立場・意見（Stance）', items:[
+    { en:"I think / I believe ...", ja:"…だと思う" },
+    { en:"I prefer ... / I'd rather ...", ja:"…のほうが好き／むしろ…したい" },
+    { en:"In my opinion, ...", ja:"私の考えでは…" },
+    { en:"For me, ...", ja:"私にとっては…" },
+    { en:"I'm a big fan of ...", ja:"…が大好きだ" },
+    { en:"I definitely prefer ...", ja:"断然…のほうが好き" }
+  ]},
+  { cat:'③ 理由を足す（Adding reasons）', items:[
+    { en:"First, ... Second, ...", ja:"第一に…、第二に…" },
+    { en:"Plus, ...", ja:"さらに…" },
+    { en:"Also, ...", ja:"それに…" },
+    { en:"On top of that, ...", ja:"おまけに…" },
+    { en:"Not only that, but also ...", ja:"それだけでなく…も" },
+    { en:"The main reason is ...", ja:"主な理由は…" }
+  ]},
+  { cat:'④ 具体例（Examples）', items:[
+    { en:"For example, ...", ja:"例えば…" },
+    { en:"For instance, ...", ja:"例えば…（やや硬め）" },
+    { en:"such as ...", ja:"…のような" },
+    { en:"Like when ...", ja:"…のようなとき" },
+    { en:"Take ... for example", ja:"…を例に取ると" }
+  ]},
+  { cat:'⑤ つなぐ・効果（Linking）', items:[
+    { en:"..., which means / helps / can ...", ja:"…、それは…を意味する/役立つ" },
+    { en:"..., making it more ...", ja:"…、それが一層…にする（分詞）" },
+    { en:"This way, ...", ja:"こうすることで…" },
+    { en:"As a result, ...", ja:"その結果…" },
+    { en:"so that ...", ja:"…するように" }
+  ]},
+  { cat:'⑥ 譲歩・対比（Contrast）', items:[
+    { en:"Even if / Even though ..., the ...", ja:"たとえ…でも、…" },
+    { en:"However, ...", ja:"しかし…" },
+    { en:"While ..., ...", ja:"…である一方で…" },
+    { en:"Although ..., ...", ja:"…だけれども…" },
+    { en:"On the other hand, ...", ja:"その一方で…" }
+  ]},
+  { cat:'⑦ 締め（Conclusion）', items:[
+    { en:"Overall, I think ...", ja:"全体として…だと思う" },
+    { en:"So, I believe ...", ja:"だから…だと思う" },
+    { en:"That's why I ...", ja:"そういうわけで私は…" },
+    { en:"All in all, ...", ja:"結局のところ…" },
+    { en:"So overall, I believe ...", ja:"だから総合的に…だと思う" }
+  ]},
+  { cat:'⑧ 強調・色づけ（Emphasis）', items:[
+    { en:"really / incredibly / absolutely", ja:"本当に／信じられないほど／絶対に" },
+    { en:"definitely", ja:"間違いなく" },
+    { en:"a great way to ...", ja:"…する素晴らしい方法" },
+    { en:"one of the best ...", ja:"最高の…のひとつ" },
+    { en:"a once-in-a-lifetime ...", ja:"一生に一度の…" }
+  ]}
+];
+// flat list (for the right-panel quick view)
+const PHRASES = PHRASE_BANK.flatMap(c=>c.items);
+
+// type-aware speaking guides (TOEFL Interview Q1-Q4 structure)
+const GUIDES = [
+  { type:'体験を語る (Describe)', steps:[
+    { t:'① ひとつ選ぶ', p:'<code>One ... I remember was ...</code> / <code>Recently, I ...</code>' },
+    { t:'② 詳しく描写', p:'いつ・どこで・何が良かったか。<code>What made it special was ...</code>' },
+    { t:'③ 感想・理由', p:'なぜ印象的か。<code>I really enjoyed ...</code> / <code>which made it ...</code>' },
+    { t:'④ まとめ', p:'<code>Overall, it was ...</code>' }
+  ]},
+  { type:'好み A or B (Preference)', steps:[
+    { t:'① 立場を即答', p:'<code>I prefer A because ...</code> / <code>I definitely prefer ...</code>' },
+    { t:'② 理由1', p:'<code>First, ...</code> / <code>It\'s easier to ...</code>' },
+    { t:'③ 理由2 ＋ 例', p:'<code>Plus, ...</code> / <code>For example, ...</code>' },
+    { t:'④ まとめ', p:'<code>So, I definitely prefer ...</code>' }
+  ]},
+  { type:'意見・賛否 (Should ...?)', steps:[
+    { t:'① 立場を明確に', p:'<code>I believe ... should ...</code>' },
+    { t:'② 理由1', p:'<code>First, it can ...</code>' },
+    { t:'③ 理由2 ＋ 譲歩', p:'<code>Even if ..., the ...</code> で反論を先に処理' },
+    { t:'④ まとめ', p:'<code>So, I think ... is a smart idea.</code>' }
+  ]},
+  { type:'未来予測 (Future)', steps:[
+    { t:'① 予測を述べる', p:'<code>I think ... will become more / less ...</code>' },
+    { t:'② 理由1（流れ・技術）', p:'<code>As technology improves, ...</code> / <code>First, ...</code>' },
+    { t:'③ 理由2 ＋ 例', p:'<code>Plus, ...</code> / <code>For example, ...</code>' },
+    { t:'④ まとめ', p:'<code>So overall, I believe ...</code>' }
+  ]}
 ];
 
 // phrase detection patterns for interview transcripts
@@ -384,6 +494,7 @@ let curLevel = REPEAT_LEVELS[0];
 let curRepeatIdx = 0;
 let curTopic = TOPICS[0];
 let curQ = 0;
+let customTopic = null; // generated {icon,title,sub,intro,qa:[{q,a}]} for free-theme mode
 // speech
 let rec = null, recording = false, sttText = '', recStart = 0, recElapsed = 0;
 let recCallback = null;
@@ -458,6 +569,7 @@ function setMode(m){
   document.getElementById('wpm-sec').classList.toggle('hide', m==='phrases');
   if(m==='repeat') renderRepeat();
   else if(m==='interview') renderInterview();
+  else if(m==='custom') renderCustom();
   else renderPhrasesMode();
 }
 
@@ -535,8 +647,19 @@ function gradeRepeat(spoken, sec){
   document.getElementById('rep-status').textContent = msg;
 }
 
+function guideHtml(idx){
+  const g = GUIDES[Math.min(idx, GUIDES.length-1)];
+  return `<div class="guide">
+    <div class="guide-head">🧭 話す型ガイド（${g.type}）— このまま話せばOK</div>
+    <div class="guide-body">
+      ${g.steps.map((s,i)=>`<div class="gstep"><div class="gn">${i+1}</div><div><div class="gt">${s.t.replace(/^[①-④]\s*/,'')}</div><div class="gp">${s.p}</div></div></div>`).join('')}
+    </div>
+  </div>`;
+}
+
 // ---- Interview ----
 function renderInterview(){
+  if(!TOPICS.find(t=>t.id===curTopic.id)){ curTopic = TOPICS[0]; curQ = 0; }
   document.getElementById('chead-title').textContent = 'Take an Interview';
   document.getElementById('chead-sub').textContent = '質問に英語で答える本番形式。録音→自動分析で、使えたフレーズと改善点がわかります。';
   document.getElementById('left-label').textContent = 'トピック選択';
@@ -561,6 +684,7 @@ function renderInterviewStage(){
         <div><button class="speak-q" onclick="speak(${JSON.stringify(fullQ).replace(/"/g,'&quot;')})">🔊 質問を聞く</button></div>
       </div>
     </div>
+    ${guideHtml(curQ)}
     <div style="max-width:720px;margin:0 auto 14px;text-align:center">
       <button class="btn btn-rec" id="iv-rec" onclick="toggleInterviewRec()">🎤 答えを録音する</button>
       <span style="color:var(--text2);font-size:12px;margin-left:10px">目安：3〜5文・45〜60秒（立場 → 理由/例 → まとめ）</span>
@@ -650,9 +774,10 @@ function analyzeAnswer(){
         <div class="check-row">${ck(hasExample)} 具体例を入れている（For example / Recently…）</div>
         <div class="check-row">${ck(hasConclusion)} まとめがある（Overall / So, I…）</div>
       </div>
-      <div class="fb-sec"><h5>⭐ 高得点モデル解答（単語をクリックで単語帳に追加）</h5>
+      ${qa.a?`<div class="fb-sec"><h5>⭐ 高得点モデル解答（単語をクリックで単語帳に追加）</h5>
         <div class="model-box markable" id="${modelId}">${esc(qa.a)}</div>
-      </div>
+        <button class="btn btn-ghost" style="margin-top:10px" onclick="bulkSaveVocab(${aq(qa.a)})">＋ このモデルから語彙を一括保存</button>
+      </div>`:''}
       ${apiKey?`<button class="btn btn-blue" onclick="aiReview()">✨ ClaudeでさらにAI添削</button><div id="ai-review"></div>`:`<div class="note">💡 さらに細かい文法・発音の添削が欲しい場合は、右上の⚙からAPIキー（任意）を設定すると Claude添削が解放されます。</div>`}
     </div>
   </div>`;
@@ -669,12 +794,101 @@ function clampScore(x){ return Math.max(1, Math.min(5, Math.round(x))); }
 
 function renderModelAnswer(qa){
   document.getElementById('right-label').textContent = '高得点モデル解答';
+  const box = document.getElementById('model-answer');
+  if(!qa.a){
+    box.innerHTML = `<div class="vempty">カスタムトピックのためモデル解答はありません。<br>右上⚙でAPIキーを入れると、AIがこの話題のモデル解答を生成できます。</div>`;
+    return;
+  }
   const id = 'rm-'+Date.now();
-  document.getElementById('model-answer').innerHTML =
+  box.innerHTML =
     `<div class="q-meta" style="margin-bottom:8px">この質問の満点解答</div>
      <div class="markable" id="${id}">${esc(qa.a)}</div>
-     <button class="btn btn-blue" style="margin-top:12px" onclick="speak(${JSON.stringify(qa.a).replace(/"/g,'&quot;')})">🔊 モデルを聞く</button>`;
+     <div style="display:flex;gap:6px;margin-top:12px">
+       <button class="btn btn-blue" onclick="speak(${aq(qa.a)})">🔊 聞く</button>
+       <button class="btn btn-ghost" onclick="bulkSaveVocab(${aq(qa.a)})">＋ 語彙を一括保存</button>
+     </div>`;
   setTimeout(()=>{ const el=document.getElementById(id); if(el) makeMarkable(el); }, 50);
+}
+
+// ---- Custom theme (YouTube etc.) ----
+function renderCustom(){
+  document.getElementById('chead-title').textContent = '自由テーマ（YouTube等）';
+  document.getElementById('chead-sub').textContent = '見つけた話題を入力すると、TOEFL形式の質問を作って練習できます。';
+  document.getElementById('left-label').textContent = '最近のテーマ';
+  const recents = JSON.parse(localStorage.getItem('tsp_recent_themes')||'[]');
+  renderLeftList(recents.length
+    ? recents.map(t=>`<div class="card" onclick="loadCustomTheme(${aq(t)})"><div class="c-title">🎬 ${esc(t.slice(0,28))}</div></div>`).join('')
+    : '<div class="vempty">まだありません。<br>右で話題を入力してください。</div>');
+  document.getElementById('right-label').textContent = '使えるフレーズ';
+  renderPhraseListPanel();
+  document.getElementById('stage').innerHTML = `
+    <div class="custom-wrap">
+      <h3 style="font-family:'Syne';font-size:16px;color:var(--gold);margin-bottom:4px">話したいテーマを入力</h3>
+      <div class="eg">URLからの自動取得はできません。動画のタイトルや話題、要点を文章で貼り付けてください。</div>
+      <label>テーマ（短く）</label>
+      <input id="ct-topic" placeholder="例：AIが仕事を変える / リモートワークの未来 / 宇宙旅行 …" />
+      <label>補足メモ（任意：要点・覚えた表現など。AI生成時に活用されます）</label>
+      <textarea id="ct-notes" placeholder="例：動画では、AIで単純作業が減るが新しい仕事も生まれると言っていた…"></textarea>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-gold" onclick="makeCustom(false)">📝 質問を作る（キー不要）</button>
+        ${apiKey?`<button class="btn btn-blue" onclick="makeCustom(true)">✨ AIで話題に合わせて作る＋モデル解答</button>`:''}
+      </div>
+      <div class="eg" style="margin-top:8px">「キー不要」はテンプレート式で4問を即生成。AI生成は話題に合った自然な質問とモデル解答を作ります（右上⚙でキー設定時のみ）。</div>
+      <div id="ct-status" class="statusline"></div>
+    </div>`;
+}
+function loadCustomTheme(topic){ setMode('custom'); setTimeout(()=>{ const i=document.getElementById('ct-topic'); if(i) i.value=topic; }, 30); }
+function saveRecentTheme(topic){
+  let r = JSON.parse(localStorage.getItem('tsp_recent_themes')||'[]');
+  r = [topic, ...r.filter(x=>x!==topic)].slice(0,8);
+  localStorage.setItem('tsp_recent_themes', JSON.stringify(r));
+}
+function templateQuestions(topic){
+  const T = topic.trim();
+  return [
+    { q:`First, can you describe a memorable experience you've had related to ${T}, and explain what made it interesting?` },
+    { q:`When it comes to ${T}, do you prefer a traditional approach or trying something new? Why?` },
+    { q:`Some people think ${T} should be encouraged for everyone, while others disagree. What is your opinion, and why?` },
+    { q:`Do you think ${T} will become more or less common in the future? Explain your thoughts.` }
+  ];
+}
+async function makeCustom(useAI){
+  const topic = (document.getElementById('ct-topic').value||'').trim();
+  const notes = (document.getElementById('ct-notes').value||'').trim();
+  if(!topic){ toast('テーマを入力してください'); return; }
+  const status = document.getElementById('ct-status');
+  saveRecentTheme(topic);
+  if(useAI && apiKey){
+    status.textContent = 'Claudeが質問とモデル解答を生成中…';
+    try{
+      const prompt = `You are a TOEFL Speaking "Take an Interview" question writer. Topic: "${topic}". ${notes?('Context notes: '+notes):''}\nCreate exactly 4 interview questions following the standard progression: (1) describe a personal experience, (2) preference between two options, (3) opinion on whether something should be done, (4) future prediction. For each, also write a natural, high-scoring spoken model answer of 80-110 words using connectors like "Plus," "For example," "Overall,".\nReturn ONLY valid JSON: {"qa":[{"q":"...","a":"..."},{"q":"...","a":"..."},{"q":"...","a":"..."},{"q":"...","a":"..."}]}`;
+      const res = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1600,messages:[{role:'user',content:prompt}]})
+      });
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||('HTTP '+res.status)); }
+      const d = await res.json();
+      const raw = d.content.map(c=>c.text||'').join('');
+      const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+      startCustomSession(topic, parsed.qa);
+    }catch(e){ status.textContent = 'AI生成エラー: '+e.message+'（テンプレ式で作成します）'; startCustomSession(topic, templateQuestions(topic)); }
+  } else {
+    startCustomSession(topic, templateQuestions(topic));
+  }
+}
+function startCustomSession(topic, qa){
+  customTopic = { icon:'🎬', title:topic.slice(0,24), sub:'Custom Theme', intro:`Today, I'd like to ask you some questions about ${topic}.`, qa };
+  curTopic = customTopic; curQ = 0;
+  mode = 'interview';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.mode==='interview'));
+  document.getElementById('chead-title').textContent = 'Take an Interview（自由テーマ）';
+  document.getElementById('chead-sub').textContent = 'あなたのテーマで本番形式。録音→自動分析。型ガイドを見ながら話しましょう。';
+  document.getElementById('left-label').textContent = 'トピック選択';
+  renderLeftList(`<div class="card active"><div class="c-title">🎬 ${esc(customTopic.title)}</div><div class="c-sub">あなたのテーマ</div></div>
+    <div class="card" onclick="setMode('custom')"><div class="c-title">＋ 別のテーマを作る</div></div>
+    <div class="card" onclick="setMode('interview')"><div class="c-title">📚 用意された問題に戻る</div></div>`);
+  renderInterviewStage();
 }
 
 // ---- Phrases mode ----
@@ -690,14 +904,37 @@ function renderPhrasesMode(){
     : '<div class="vempty">Interview/Repeatで単語をクリックすると、ここに集まります</div>';
   const stage = document.getElementById('stage');
   stage.innerHTML = `<div style="max-width:760px;margin:0 auto">
-    <h3 style="font-family:'Syne';font-size:16px;margin-bottom:14px;color:var(--gold)">ネイティブがよく使う表現集</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      ${PHRASES.map(p=>`<div class="card" onclick="speak(${JSON.stringify(p.en.replace(/~|\.\.\./g,'').trim()).replace(/"/g,'&quot;')})" style="cursor:pointer">
-        <div style="color:var(--gold);font-weight:600;font-size:13px;margin-bottom:4px">${esc(p.en)}</div>
-        <div style="font-size:12px;color:var(--text1)">${esc(p.ja)}</div></div>`).join('')}
-    </div>
-    <div class="note" style="margin-top:16px">クリックで読み上げ。これらは全トピックで使い回せる「得点フレーズ」です。Interviewタブで実際に使うと、フィードバックで✓が付きます。</div>
+    <h3 style="font-family:'Syne';font-size:16px;margin-bottom:6px;color:var(--gold)">ネイティブがよく使う表現集（機能別）</h3>
+    <div class="note" style="margin-bottom:16px">🔊で読み上げ、＋で単語帳に保存。①〜⑧の順に並べれば、それだけで筋の通った解答になります。Interviewで実際に使うと自動で✓が付きます。</div>
+    ${PHRASE_BANK.map(c=>`
+      <div class="cat">
+        <h4>${esc(c.cat)}<span class="badge">${c.items.length}</span></h4>
+        ${c.items.map(p=>{
+          const clean = p.en.replace(/~|\.\.\.|\s*\/\s*/g,' ').trim();
+          return `<div class="pcard">
+            <div><div class="pe">${esc(p.en)}</div><div class="pj">${esc(p.ja)}</div></div>
+            <div class="pacts">
+              <button class="pmini" onclick="speak(${JSON.stringify(clean).replace(/"/g,'&quot;')})">🔊</button>
+              <button class="pmini" onclick="savePhrase(${aq(p.en)},${aq(p.ja)})">＋</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`).join('')}
   </div>`;
+}
+function savePhrase(en, ja){ addVocab2(en, ja); }
+// store a phrase in the notebook (word=phrase, sentence=ja meaning)
+function addVocab2(en, ja){
+  const key = en.toLowerCase();
+  if(vocab.find(v=>v.word.toLowerCase()===key)){ toast('保存済みです'); return; }
+  vocab.unshift({ word:en, sentence:ja, date:new Date().toLocaleDateString('ja-JP'), id:Date.now() });
+  saveVocab(); renderVocab(); toast(`「${en}」を保存 ⭐`);
+}
+function renderPhraseListPanel(){
+  const el = document.getElementById('phrase-list');
+  if(!el) return;
+  el.innerHTML = PHRASES.slice(0,14).map(p=>`<div class="phrase-item"><b>${esc(p.en)}</b><br>${esc(p.ja)}</div>`).join('')
+    + `<div class="phrase-item" style="text-align:center"><a onclick="setMode('phrases')" style="color:var(--gold);cursor:pointer">全${PHRASES.length}表現を見る →</a></div>`;
 }
 
 // ════════════════ AI (optional) ════════════════
@@ -742,6 +979,20 @@ function addVocab(word, sentence){
   vocab.unshift({ word, sentence:(sentence||'').slice(0,160), date:new Date().toLocaleDateString('ja-JP'), id:Date.now() });
   saveVocab(); renderVocab(); toast(`「${word}」を単語帳に追加 ⭐`);
 }
+const STOPWORDS = new Set("the a an and or but so if of to in on at for with from by as is are was were be been being it its this that these those i you he she we they me my your our their his her them us do does did have has had will would can could should may might must not no nor too very just also than then there here what which who whom whose how when where why all any some most more much many few each every both either neither one two about into over under out up down off only own same such own really definitely".split(/\s+/));
+function bulkSaveVocab(text){
+  const seen = new Set(vocab.map(v=>v.word));
+  const sentence = (text||'').slice(0,160);
+  let added=0;
+  words(text).forEach(w=>{
+    w = w.replace(/[^a-z'-]/g,'');
+    if(w.length<4 || STOPWORDS.has(w) || seen.has(w)) return;
+    seen.add(w); added++;
+    vocab.unshift({ word:w, sentence, date:new Date().toLocaleDateString('ja-JP'), id:Date.now()+added });
+  });
+  if(added){ saveVocab(); renderVocab(); toast(`${added}語を単語帳に一括追加 ⭐`); }
+  else toast('新しく追加できる語がありませんでした');
+}
 function removeVocab(id){ vocab = vocab.filter(v=>v.id!==id); saveVocab(); renderVocab(); }
 function saveVocab(){ localStorage.setItem('tsp_vocab', JSON.stringify(vocab)); }
 function renderVocab(){
@@ -764,6 +1015,8 @@ function toggleVocab(){
 // ════════════════ MISC ════════════════
 function setWpm(n){ document.getElementById('wpm-num').textContent = n; }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// safe JSON literal for use inside a double-quoted HTML attribute
+function aq(s){ return JSON.stringify(s).replace(/"/g,'&quot;'); }
 function toast(msg){ const e=document.createElement('div'); e.className='toast'; e.textContent=msg; document.body.appendChild(e); setTimeout(()=>e.remove(),2300); }
 function openSettings(){ document.getElementById('key-input').value = apiKey; document.getElementById('settings-modal').classList.add('show'); }
 function closeSettings(){ document.getElementById('settings-modal').classList.remove('show'); }
@@ -771,7 +1024,13 @@ function saveKey(){ apiKey = document.getElementById('key-input').value.trim(); 
 
 // init
 if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged = ()=>{}; }
+// click a phrase chip inside the speaking guide to hear it
+document.addEventListener('click', e=>{
+  const c = e.target.closest('.gstep .gp code');
+  if(c) speak(c.textContent.replace(/\.\.\.|~/g,' ').replace(/\s+/g,' ').trim());
+});
 renderVocab();
+renderPhraseListPanel();
 setMode('repeat');
 </script>
 </body>
