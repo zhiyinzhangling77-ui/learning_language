@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEFL Speaking トレーナー</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg0: #09090b; --bg1: #111114; --bg2: #18181c; --bg3: #222228; --bg4: #2a2a32;
+  --line: rgba(255,255,255,0.07); --line2: rgba(255,255,255,0.12);
+  --text0: #f4f1ec; --text1: #a8a39a; --text2: #5e5a55;
+  --gold: #d4a843; --gold2: #f0c870; --gold-bg: rgba(212,168,67,0.1);
+  --green: #3dba7a; --green-bg: rgba(61,186,122,0.1);
+  --blue: #5b9bd4; --blue-bg: rgba(91,155,212,0.1);
+  --red: #d45b5b; --red-bg: rgba(212,91,91,0.1);
+  --purple: #9b7dd4; --purple-bg: rgba(155,125,212,0.1);
+  --r: 10px; --r2: 14px;
+}
+body { background: var(--bg0); color: var(--text0); font-family: 'Inter', sans-serif; font-size: 14px; height: 100vh; overflow: hidden; }
+button { font-family: inherit; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 99px; }
+
+.app { display: grid; grid-template-rows: 56px 1fr; height: 100vh; }
+
+/* TOPBAR */
+.topbar { background: var(--bg1); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 18px; gap: 18px; }
+.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; color: var(--gold); letter-spacing: -0.02em; white-space: nowrap; }
+.logo em { color: var(--text1); font-style: normal; font-weight: 400; font-size: 11px; margin-left: 8px; }
+.tabs { flex: 1; display: flex; justify-content: center; gap: 6px; }
+.tab { display: flex; align-items: center; gap: 7px; padding: 7px 16px; border-radius: 100px; cursor: pointer; font-size: 13px; color: var(--text2); font-weight: 500; transition: all 0.15s; border: 1px solid transparent; }
+.tab:hover { color: var(--text1); }
+.tab.active { background: var(--gold-bg); color: var(--gold); border-color: rgba(212,168,67,0.25); }
+.tab .ic { font-size: 14px; }
+.top-stat { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text1); white-space: nowrap; }
+.top-stat b { font-family: 'Syne', sans-serif; font-size: 16px; color: var(--gold); }
+.gear { background: var(--bg2); border: 1px solid var(--line2); color: var(--text1); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+.gear:hover { border-color: var(--gold); color: var(--gold); }
+
+.body { display: grid; grid-template-columns: 252px 1fr 300px; overflow: hidden; }
+
+/* PANELS */
+.panel { background: var(--bg1); display: flex; flex-direction: column; overflow: hidden; }
+.left { border-right: 1px solid var(--line); }
+.right { border-left: 1px solid var(--line); }
+.psec { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.plabel { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); margin-bottom: 10px; }
+.scrolly { overflow-y: auto; flex: 1; }
+
+/* topic / level cards */
+.card { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r); padding: 11px 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; }
+.card:hover { border-color: var(--line2); background: var(--bg3); }
+.card.active { border-color: var(--gold); background: var(--gold-bg); }
+.card .c-title { font-size: 12.5px; font-weight: 500; margin-bottom: 3px; }
+.card .c-sub { font-size: 11px; color: var(--text2); }
+.card.active .c-sub { color: rgba(212,168,67,0.7); }
+.lvl-badge { display:inline-block; font-size:9px; font-weight:700; padding:1px 6px; border-radius:99px; margin-left:6px; }
+
+/* center */
+.center { display: flex; flex-direction: column; overflow: hidden; }
+.chead { padding: 16px 22px; border-bottom: 1px solid var(--line); background: var(--bg1); }
+.chead h2 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+.chead p { font-size: 12px; color: var(--text1); margin-top: 3px; }
+.stage { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* question / prompt block */
+.qblock { max-width: 720px; margin: 0 auto 18px; }
+.q-meta { font-size: 11px; color: var(--gold); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; display:flex; align-items:center; gap:10px; }
+.examiner { background: var(--bg2); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 4px 10px 10px 4px; padding: 14px 18px; font-size: 15px; line-height: 1.6; }
+.examiner .speak-q { background: none; border: 1px solid var(--line2); color: var(--text1); border-radius: 7px; padding: 4px 10px; font-size: 11px; cursor: pointer; margin-top: 10px; display:inline-flex; align-items:center; gap:5px; }
+.examiner .speak-q:hover { border-color: var(--blue); color: var(--blue); }
+
+/* repeat target */
+.repeat-target { background: var(--bg2); border:1px solid var(--line); border-radius: var(--r2); padding: 22px 24px; max-width: 720px; margin: 0 auto 18px; text-align:center; }
+.repeat-target .rt-sentence { font-size: 22px; line-height: 1.5; font-weight: 500; margin-bottom: 16px; }
+.repeat-target .rt-controls { display:flex; gap:10px; justify-content:center; }
+.btn { border: none; border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; display:inline-flex; align-items:center; gap:7px; }
+.btn-gold { background: var(--gold); color: var(--bg0); }
+.btn-gold:hover { background: var(--gold2); }
+.btn-blue { background: var(--blue-bg); color: var(--blue); border:1px solid rgba(91,155,212,0.3); }
+.btn-blue:hover { background: rgba(91,155,212,0.2); }
+.btn-ghost { background: var(--bg3); color: var(--text1); border:1px solid var(--line2); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-rec { background: var(--bg3); color: var(--text1); border:1px solid var(--line2); }
+.btn-rec.recording { background: var(--red-bg); color: var(--red); border-color: var(--red); animation: pulse 1.1s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(212,91,91,0.4)} 50%{box-shadow:0 0 0 7px rgba(212,91,91,0)} }
+
+.transcript-box { max-width:720px; margin: 0 auto 16px; background: var(--bg2); border:1px solid var(--line2); border-radius: var(--r); padding: 14px 16px; min-height: 70px; }
+.transcript-box .tb-label { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text2); margin-bottom:8px; display:flex; justify-content:space-between; }
+.transcript-box .tb-text { font-size:14px; line-height:1.7; color: var(--text0); }
+.transcript-box .tb-text:empty::before { content:'録音すると、ここに文字起こしが表示されます'; color: var(--text2); font-style: italic; }
+.transcript-box textarea { width:100%; background:transparent; border:none; color:var(--text0); font-family:inherit; font-size:14px; line-height:1.7; resize:vertical; min-height:50px; outline:none; }
+
+/* diff word marks (listen&repeat) */
+.w-hit { color: var(--green); }
+.w-miss { color: var(--red); text-decoration: line-through; opacity:0.7; }
+.w-extra { color: var(--text2); }
+
+/* feedback card */
+.fb-card { max-width:720px; margin: 18px auto 0; background: var(--bg1); border:1px solid var(--line); border-radius: var(--r2); overflow:hidden; }
+.fb-head { padding: 16px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; }
+.fb-head .score { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; color:var(--gold); line-height:1; }
+.fb-head .score sub { font-size:15px; color:var(--text2); font-weight:400; font-family:'Inter'; }
+.fb-head .tag { font-size:12px; color:var(--text1); }
+.metrics { display:grid; grid-template-columns: repeat(4,1fr); gap:1px; background:var(--line); }
+.metric { background: var(--bg1); padding:12px 10px; text-align:center; }
+.metric .mv { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; }
+.metric .ml { font-size:10px; color:var(--text2); margin-top:3px; }
+.fb-body { padding: 16px 20px; }
+.fb-sec { margin-bottom:16px; }
+.fb-sec:last-child { margin-bottom:0; }
+.fb-sec h5 { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:9px; }
+.chip { display:inline-block; font-size:11px; padding:4px 11px; border-radius:99px; margin:3px 4px 3px 0; }
+.chip-green { background: var(--green-bg); color: var(--green); border:1px solid rgba(61,186,122,0.25); }
+.chip-gold { background: var(--gold-bg); color: var(--gold); border:1px solid rgba(212,168,67,0.25); cursor:default; }
+.chip-gray { background: var(--bg3); color: var(--text2); border:1px solid var(--line); }
+.check-row { display:flex; align-items:center; gap:9px; font-size:13px; padding:5px 0; color:var(--text1); }
+.check-row .ck { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+.ck.ok { background:var(--green-bg); color:var(--green); border:1px solid rgba(61,186,122,0.3); }
+.ck.no { background:var(--bg3); color:var(--text2); border:1px solid var(--line2); }
+.model-box { background: var(--green-bg); border:1px solid rgba(61,186,122,0.2); border-radius: 8px; padding:13px 15px; font-size:13px; line-height:1.8; }
+.note { font-size:11px; color:var(--text2); margin-top:8px; line-height:1.5; }
+
+/* right panel */
+.model-answer { padding: 14px 16px; }
+.markable { line-height:1.85; font-size:13px; }
+.mw { cursor:pointer; padding:0 1px; border-radius:3px; transition: background 0.1s; }
+.mw:hover { background: rgba(212,168,67,0.18); }
+.phrase-item { font-size:11.5px; color:var(--text1); padding:7px 0; border-bottom:1px solid var(--line); line-height:1.55; }
+.phrase-item:last-child { border:none; }
+.phrase-item b { color:var(--gold); font-weight:500; }
+
+/* vocab */
+.vocab-head { padding:10px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; border-top:1px solid var(--line); }
+.vocab-head:hover { background: var(--bg2); }
+.vcount { background:var(--gold-bg); color:var(--gold); border:1px solid rgba(212,168,67,0.3); border-radius:99px; font-size:10px; font-weight:700; padding:1px 7px; min-width:20px; text-align:center; }
+.vlist { max-height: 220px; overflow-y:auto; padding:6px 12px 12px; }
+.ventry { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:6px; position:relative; }
+.ventry .vw { font-weight:600; color:var(--gold); font-size:13px; margin-bottom:3px; }
+.ventry .vs { font-size:11px; color:var(--text1); line-height:1.6; }
+.ventry .vs mark { background: rgba(212,168,67,0.2); color:var(--gold2); border-radius:2px; padding:0 2px; }
+.ventry .vd { position:absolute; top:6px; right:8px; background:none; border:none; color:var(--text2); font-size:14px; cursor:pointer; }
+.ventry .vd:hover { color:var(--red); }
+.vempty { font-size:12px; color:var(--text2); text-align:center; padding:14px; }
+
+/* toast */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--line2); border-radius:8px; padding:9px 18px; font-size:12px; color:var(--gold); z-index:400; box-shadow:0 6px 24px rgba(0,0,0,0.4); }
+
+/* status line */
+.statusline { font-size:11px; color:var(--text2); text-align:center; min-height:16px; margin-top:10px; }
+.statusline.rec { color:var(--red); }
+
+/* modal */
+.modal-bg { position:fixed; inset:0; background:rgba(9,9,11,0.85); z-index:500; display:none; align-items:center; justify-content:center; }
+.modal-bg.show { display:flex; }
+.modal { background:var(--bg2); border:1px solid var(--line2); border-radius:16px; padding:28px; max-width:440px; width:90%; }
+.modal h3 { font-family:'Syne',sans-serif; font-size:18px; color:var(--gold); margin-bottom:6px; }
+.modal p { font-size:12.5px; color:var(--text1); line-height:1.7; margin-bottom:16px; }
+.modal input { width:100%; background:var(--bg3); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:inherit; font-size:13px; padding:10px 13px; outline:none; margin-bottom:14px; }
+.modal input:focus { border-color:var(--gold); }
+.modal-row { display:flex; gap:8px; }
+.empty-stage { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text2); gap:8px; text-align:center; }
+.empty-stage .big { font-family:'Syne',sans-serif; font-size:18px; color:var(--text1); font-weight:600; }
+.hide { display:none !important; }
+.progress-mini { font-size:11px; color:var(--text1); }
+.wpm-mini { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:11px 13px; }
+.wpm-mini .n { font-family:'Syne',sans-serif; font-size:26px; font-weight:700; color:var(--blue); }
+.wpm-mini .l { font-size:10px; color:var(--text2); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">TOEFL Speaking <em>満点トレーナー</em></div>
+    <div class="tabs">
+      <div class="tab active" data-mode="repeat" onclick="setMode('repeat')"><span class="ic">🔁</span>Listen &amp; Repeat</div>
+      <div class="tab" data-mode="interview" onclick="setMode('interview')"><span class="ic">🎤</span>Interview</div>
+      <div class="tab" data-mode="phrases" onclick="setMode('phrases')"><span class="ic">💬</span>フレーズ &amp; 語彙</div>
+    </div>
+    <div class="top-stat"><span>単語帳</span><b id="top-vocab">0</b></div>
+    <button class="gear" onclick="openSettings()" title="設定（任意のAI添削キー）">⚙</button>
+  </div>
+
+  <div class="body">
+    <!-- LEFT -->
+    <div class="panel left">
+      <div class="psec">
+        <div class="plabel" id="left-label">レベル選択</div>
+        <div id="left-list"></div>
+      </div>
+      <div class="psec" id="wpm-sec">
+        <div class="plabel">直近のスピード</div>
+        <div class="wpm-mini"><div class="n" id="wpm-num">—</div><div class="l">words per minute（目標 110–160）</div></div>
+      </div>
+      <div class="scrolly"></div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="panel center">
+      <div class="chead">
+        <h2 id="chead-title">Listen &amp; Repeat</h2>
+        <p id="chead-sub">聞いて、復唱する。発音とリズムを体に入れる練習です。</p>
+      </div>
+      <div class="stage" id="stage"></div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="panel right">
+      <div class="psec"><div class="plabel" id="right-label">高得点モデル解答</div><div style="font-size:11px;color:var(--text2)">単語をクリックで単語帳に追加</div></div>
+      <div class="scrolly">
+        <div class="model-answer" id="model-answer"></div>
+        <div class="psec" style="border-top:1px solid var(--line)">
+          <div class="plabel">ネイティブがよく使う表現</div>
+          <div id="phrase-list"></div>
+        </div>
+      </div>
+      <div class="vocab-head" onclick="toggleVocab()">
+        <div style="display:flex;align-items:center;gap:8px"><span class="plabel" style="margin:0">単語帳</span><span class="vcount" id="vcount">0</span></div>
+        <span id="varrow" style="font-size:11px;color:var(--text2)">▲</span>
+      </div>
+      <div id="vbody"><div class="vlist" id="vlist"><div class="vempty" id="vempty">単語をクリックして保存しましょう</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-bg" id="settings-modal">
+  <div class="modal">
+    <h3>AI添削（任意）</h3>
+    <p>このアプリはAPIキーなしで全機能が動きます。さらに「Claudeによる細かい添削」を使いたい場合のみ、Anthropic APIキーを入力してください。キーはこの端末のブラウザにのみ保存されます。</p>
+    <input type="password" id="key-input" placeholder="sk-ant-... （任意。空欄でOK）" />
+    <div class="modal-row">
+      <button class="btn btn-gold" style="flex:1" onclick="saveKey()">保存</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeSettings()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════ DATA ════════════════
+const TOPICS = [
+  { id:'restaurants', icon:'🍽️', title:'レストラン・カフェ', sub:'Restaurants & Cafés',
+    intro:"Today, I'd like to ask you some questions about your experiences eating at restaurants and cafés.",
+    qa:[
+      {q:"First, can you describe a memorable meal you've had at a restaurant or café and explain what made it special?",
+       a:"One memorable meal I had was at a small Italian café in my neighborhood. I remember it because the food was fantastic and the atmosphere felt really cozy. The pasta was handmade and tasted fresh, and the sauce was rich with flavors of tomato and basil. The staff was incredibly friendly, and they even recommended a perfect wine pairing. Eating there felt like a little escape to Italy, which made it a really special experience for me."},
+      {q:"When eating out with friends or family, do you prefer choosing a familiar place you visit often or trying a new restaurant for the first time? Why?",
+       a:"I prefer trying a new restaurant when I'm eating out with friends or family. It's exciting to explore different cuisines and discover new flavors together. Plus, it creates a memorable experience and gives us something fresh to talk about. Trying new places can also help us find hidden gems and support local businesses. Overall, I think the adventure of trying something new makes the meal more enjoyable and special."},
+      {q:"Restaurant menus sometimes include foods higher in calories and sugar. Do you think restaurants should add nutrition labels to their menus to help customers make healthier choices? Why or why not?",
+       a:"I believe restaurants should add nutrition labels to their menus. Knowing the calorie and sugar content can help customers make informed decisions about what they're eating. It can be hard to judge how healthy a dish is just by looking at it, so having that info on the menu makes it easier. Plus, it can encourage people to pick healthier options, which is great for overall health. So yeah, I think nutrition labels on menus are a smart idea."},
+      {q:"Do you think take-out and delivery orders will become more common than eating inside restaurants and cafés? Why or why not?",
+       a:"I think take-out and delivery orders will definitely become more common than eating inside restaurants and cafés. With busy work schedules, people find it more convenient to order food at home. Also, with the popularity of food delivery apps, it's super easy to try out different cuisines without leaving the house. Plus, during the pandemic, many got used to the safety and comfort of eating at home. So, I believe take-out and delivery options will keep growing."}
+    ]},
+  { id:'study', icon:'📚', title:'勉強グループ', sub:'Study Groups',
+    intro:"Today, I'd like to ask you some questions about study groups.",
+    qa:[
+      {q:"First, can you describe a study group you have been a part of or observed, and explain how the group was started and how it worked together?",
+       a:"Sure, I'd love to talk about a study group I was part of last semester in my calculus class. We started the group after noticing that several classmates, including myself, were struggling with some concepts. We decided to meet twice a week in the library. Each session, we would assign a topic in advance to study individually, then we'd meet to discuss and solve problems together. We took turns explaining concepts so everyone could understand better, and it really boosted our grades. Overall, the group worked well because we were organized and supportive of each other's learning."},
+      {q:"When forming a study group, do you think it is better to work with classmates you already know well, or to form a group with new people? Why?",
+       a:"I think it's better to form a study group with classmates I already know well. When I know the group members, I can communicate more easily and understand each other's strengths and weaknesses. This makes it simpler to divide tasks and support each other. Plus, I'm usually more comfortable discussing difficult topics, which can help tackle challenging subjects. Familiarity can boost trust and collaboration, making the study group more effective overall. So, I definitely prefer working with classmates I'm already familiar with."},
+      {q:"When a study group member doesn't contribute equally, it can affect the group's progress. Do you think study groups should set clear rules for participation from the start? Why or why not?",
+       a:"I believe study groups should definitely set clear rules for participation from the start. Having rules helps ensure everyone contributes equally, which is important for the group's success. When members know what's expected, they're more likely to stay responsible and committed. Also, it prevents misunderstandings or conflicts over unequal workloads later. Setting rules at the beginning creates a fair, organized environment that can help the group reach its goals more effectively. So, having clear guidelines is definitely a smart move."},
+      {q:"With more courses and meetings happening online, do you think virtual study groups will become more common than in-person ones? Explain your thoughts.",
+       a:"I believe virtual study groups will become more common than in-person ones. Online courses are growing, and virtual study groups fit well with this trend. They offer flexibility, allowing students from different locations to join without travel. Plus, digital tools like screen sharing make collaboration easy. Also, virtual groups can save time and accommodate busy schedules. So, I think the benefits of convenience and accessibility will make virtual study groups the norm in the future."}
+    ]},
+  { id:'creativity', icon:'🎨', title:'創造性・日常', sub:'Creativity in Daily Routines',
+    intro:"Today, I'd like to ask you some questions about creativity in daily routines.",
+    qa:[
+      {q:"First, can you tell me about a way you include creativity in your typical day or describe a creative activity you enjoy?",
+       a:"I include creativity in my day by cooking new dishes. I love experimenting with different ingredients and coming up with unique recipes. It feels like a creative challenge to make something tasty and visually appealing. Plus, cooking allows me to express myself and share a part of me with family and friends. It's also a great stress reliever, as focusing on something fun takes my mind off daily problems. So, cooking is my creative outlet."},
+      {q:"When you have a busy schedule, do you find it easier to fit in creative time early in the morning or later in the day? Why?",
+       a:"I find it easier to fit in creative time early in the morning. In the morning, my mind feels fresh and rested, which helps me think more clearly and come up with new ideas. Plus, it's usually quieter, so I can focus better without any distractions. Starting my day with creativity also gives me energy and motivation, which helps me handle the rest of my busy schedule. So for me, morning is the best time for creative work."},
+      {q:"A workplace might let employees spend part of their day on personal creative projects, but this means less time for regular duties. Do you think workplaces should offer this option? Why or why not?",
+       a:"I think workplaces should definitely offer employees time for personal creative projects. First, it can boost creativity and innovation in the company, as people often bring new ideas from their side projects. Also, it can increase job satisfaction and morale because employees feel more valued and motivated. Even if there's less time for regular duties, the increased engagement and creativity could actually improve overall productivity. So, I believe this option is a win-win for both employees and the company."},
+      {q:"Some people believe everyone should actively practice creative thinking, while others think it should be optional. Do you believe creativity should be encouraged for all, or left as a personal choice? Why or why not?",
+       a:"I believe creativity should definitely be encouraged for everyone. First, being creative helps solve problems by thinking outside the box, which can be useful in many areas of life. Second, it brings a lot of joy because exploring new ideas and expressing myself can be really satisfying. Plus, practicing creativity can boost innovation and lead to personal growth, making life more enriching. So, encouraging creativity as part of everyone's daily routine is a great idea."}
+    ]},
+  { id:'events', icon:'🎟️', title:'公共イベント', sub:'Choosing Public Events',
+    intro:"Today, I'd like to ask you some questions about choosing public events to attend during your free time.",
+    qa:[
+      {q:"First, can you describe a public event you recently went to and share what drew you to participate?",
+       a:"Recently, I attended a local music festival in my city, and it was an amazing experience. What really drew me to participate was the lineup of popular bands that I love. Plus, I've always enjoyed live music, as it gives me a unique high-energy feeling that I can't get from just listening to recorded tracks. Also, it was a great chance to hang out with friends and meet new people who share similar tastes in music. Overall, the event was a perfect mix of fun and excitement, and I'm glad I went!"},
+      {q:"When deciding which events to attend, do you prefer events that are large, like festivals or concerts, or smaller ones such as workshops or community gatherings? Why?",
+       a:"I prefer attending smaller events like workshops or community gatherings. First, these events are more personal, so it's easier to connect with people and have meaningful conversations. I can really dive into topics and learn more from hands-on experiences. Plus, smaller events are often less overwhelming and crowded, making them more relaxing and enjoyable. Lastly, I feel like I can contribute more to the event's atmosphere, creating a sense of community. That's why I like smaller events better."},
+      {q:"Tickets for popular events sometimes sell out quickly, while less popular events are more accessible but may be less exciting. Would you try harder to get into a popular event even if it's difficult, or choose one that is less crowded? Why or why not?",
+       a:"I would try harder to get into a popular event even if it's difficult. Popular events usually offer unique experiences because of the atmosphere and excitement from the crowd. For example, attending a concert of a famous band is thrilling due to the energy of the fans and the live performance. Also, these events often have higher quality entertainment, making them worth the effort to attend. So, I believe trying to get into a popular event is definitely rewarding."},
+      {q:"Do you think people will attend more public events in person, or will they prefer virtual events in the future? Explain your thoughts.",
+       a:"I think people will attend more virtual events in the future. Virtual events offer a lot of convenience since I can join from anywhere without traveling. They also save time and money on things like transportation and accommodation. Plus, virtual platforms often have extra features like instant chat and easy access to additional content, which can enhance the experience. As technology keeps getting better, virtual events will likely become even more engaging and accessible. So overall, I believe virtual events will grow in popularity."}
+    ]},
+  { id:'reading', icon:'📖', title:'読書習慣', sub:'Reading Habits',
+    intro:"Today I'd like to ask you some questions about your reading habits.",
+    qa:[
+      {q:"First, can you tell me about the last book you read and what you liked or disliked about it?",
+       a:"The last book I read was \"The Midnight Library\" by Matt Haig. I really liked how it dives into the idea of exploring life's possibilities. The story is engaging because it makes you think about the choices you've made and what paths you might take in life. I also enjoyed the character development, as you get to see the protagonist grow and learn from her experiences. The only thing I didn't like was that it got a bit repetitive towards the end, but overall, it was a thought-provoking read."},
+      {q:"If you were to select a book for pleasure reading, would you be more likely to choose a work of fiction or a nonfiction book? Why?",
+       a:"I would choose a work of fiction for pleasure reading. Fiction allows me to escape into different worlds and explore the lives of unique characters, which is both relaxing and exciting. It sparks my imagination and gives me a break from everyday life. Plus, fiction often explores deep themes that make me think about life differently. So, reading fiction not only entertains me but also enriches my perspective on the world."},
+      {q:"Nowadays many people prefer reading digital books over printed ones. Do you think digital books will completely replace printed books in the future? Why or why not?",
+       a:"I think digital books might become more popular, but I don't think they'll completely replace printed books. Digital books are convenient because you can carry a bunch on one device, and they're often cheaper. However, printed books offer a unique experience. Some people just love the feel of holding a book and turning the pages. Plus, printed books don't require batteries or screens, making them more relaxing for some. So, while digital books will continue to grow, printed books will still have a place."},
+      {q:"Book clubs allow participants to engage with others as part of the reading process. Do you think joining a book club or reading group enhances the reading experience? Why or why not?",
+       a:"I definitely think joining a book club enhances the reading experience. For starters, it gives you a chance to discuss books with others, which can bring new insights and make the story more interesting. Also, book clubs can introduce you to books you might never pick up on your own, expanding your horizons. Plus, the social aspect of a book club means you can connect with people who share your interests, making the whole reading process more enjoyable and rewarding."}
+    ]}
+];
+
+// Listen & Repeat sentences, graded by difficulty
+const REPEAT_LEVELS = [
+  { id:'L1', name:'Level 1 基礎', color:'var(--green)', bg:'var(--green-bg)', desc:'短い単文。発音とリズムの土台。',
+    sentences:[
+      "I really enjoy cooking new dishes at home.",
+      "I prefer trying a new restaurant with my friends.",
+      "Reading fiction helps me relax after a long day.",
+      "I usually think more clearly early in the morning.",
+      "Live music gives me a lot of energy.",
+      "Our study group met twice a week in the library."
+    ]},
+  { id:'L2', name:'Level 2 標準', color:'var(--blue)', bg:'var(--blue-bg)', desc:'接続詞でつなぐ複文。流れを作る。',
+    sentences:[
+      "I like smaller events because it's easier to connect with people.",
+      "Digital books are convenient, but I still love printed ones.",
+      "I joined a study group, and it really boosted my grades.",
+      "Creativity brings me joy, so I practice it every day.",
+      "Virtual events save time, and they are easy to join from anywhere.",
+      "The food was fantastic, and the atmosphere felt really cozy."
+    ]},
+  { id:'L3', name:'Level 3 応用', color:'var(--gold)', bg:'var(--gold-bg)', desc:'関係詞・従属節。情報を埋め込む。',
+    sentences:[
+      "The café that I visited last week had pasta that tasted incredibly fresh.",
+      "What really drew me to the festival was the lineup of bands I love.",
+      "When members know what's expected, they are more likely to stay committed.",
+      "Book clubs can introduce you to books you might never pick up on your own.",
+      "Starting my day with creativity gives me energy that lasts for hours.",
+      "Trying new places can help us find hidden gems and support local businesses."
+    ]},
+  { id:'L4', name:'Level 4 上級', color:'var(--purple)', bg:'var(--purple-bg)', desc:'複数の節・複雑な名詞句。C1〜C2級。',
+    sentences:[
+      "Although there might be less time for regular duties, the increased engagement and creativity could actually improve overall productivity.",
+      "Even though digital books continue to grow in popularity, the unique experience of holding a printed book will always have a place.",
+      "Setting clear rules at the beginning creates a fair, organized environment that can help the group reach its goals more effectively.",
+      "What makes smaller gatherings so appealing is the relaxed atmosphere in which everyone gets a chance to participate.",
+      "The convenience and accessibility that virtual platforms offer will likely make them the preferred choice for many people in the future."
+    ]}
+];
+
+const PHRASES = [
+  { en:"What really drew me to ~ was ...", ja:"〜に惹かれた一番の理由は…だった" },
+  { en:"What I enjoy about it is ...", ja:"それの好きなところは…" },
+  { en:"Plus, ... / Also, ...", ja:"さらに… / それに…（理由の追加）" },
+  { en:"First, ... Second, ... So, ...", ja:"列挙して結論に運ぶ黄金パターン" },
+  { en:"Overall, I think ...", ja:"全体として…だと思う（締め）" },
+  { en:"So, I believe / I definitely prefer ...", ja:"だから…だと思う / 断然…が好き" },
+  { en:"For example, ...", ja:"例えば…（具体例で説得力UP）" },
+  { en:"Even if / Even though ..., the ...", ja:"たとえ…でも、…（譲歩）" },
+  { en:"..., which can / helps / makes ...", ja:"関係詞で効果をスマートに追加" },
+  { en:"..., making it more ...", ja:"分詞構文で「それが〜にする」" },
+  { en:"Not only ... but also ...", ja:"それだけでなく…も" },
+  { en:"That's why I ...", ja:"そういうわけで私は…（締め）" }
+];
+
+// phrase detection patterns for interview transcripts
+const PHRASE_DETECT = [
+  { label:"Plus,", re:/\bplus\b/i },
+  { label:"Also,", re:/\balso\b/i },
+  { label:"Overall,", re:/\boverall\b/i },
+  { label:"So, I think/believe", re:/\bso,?\s+i\s+(think|believe)\b/i },
+  { label:"For example", re:/\bfor example\b/i },
+  { label:"First / Second", re:/\b(first|firstly|second|secondly|lastly)\b/i },
+  { label:"What ... is/was", re:/\bwhat\b[\s\S]{0,40}?\b(is|was)\b/i },
+  { label:"which (関係詞)", re:/\bwhich\b/i },
+  { label:"because", re:/\bbecause\b/i },
+  { label:"That's why", re:/\bthat'?s why\b/i },
+  { label:"Not only ... but also", re:/\bnot only\b/i },
+  { label:"Even if/though", re:/\beven (if|though)\b/i },
+  { label:"making it (分詞)", re:/\bmaking (it|them|the)\b/i }
+];
+
+// ════════════════ STATE ════════════════
+let mode = 'repeat';
+let apiKey = localStorage.getItem('tsp_key') || '';
+let vocab = JSON.parse(localStorage.getItem('tsp_vocab') || '[]');
+let curLevel = REPEAT_LEVELS[0];
+let curRepeatIdx = 0;
+let curTopic = TOPICS[0];
+let curQ = 0;
+// speech
+let rec = null, recording = false, sttText = '', recStart = 0, recElapsed = 0;
+let recCallback = null;
+
+// ════════════════ SPEECH ════════════════
+function sttSupported(){ return ('SpeechRecognition' in window) || ('webkitSpeechRecognition' in window); }
+
+function startRec(lang, onLive, onDone){
+  if(!sttSupported()){ toast('音声入力はChrome/Edgeに対応しています'); if(onDone) onDone('',0); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  rec = new SR();
+  rec.lang = lang || 'en-US';
+  rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+  sttText = ''; recStart = Date.now();
+  recording = true; recCallback = onDone;
+  rec.onresult = (e)=>{
+    let interim = '', finalT = sttText;
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t = e.results[i][0].transcript;
+      if(e.results[i].isFinal){ finalT += (finalT && !finalT.endsWith(' ') ? ' ' : '') + t.trim(); }
+      else interim += t;
+    }
+    sttText = finalT;
+    if(onLive) onLive((sttText + ' ' + interim).trim());
+  };
+  rec.onerror = (e)=>{ if(e.error==='no-speech'||e.error==='aborted') return; toast('音声エラー: '+e.error); };
+  rec.onend = ()=>{ if(recording){ try{ rec.start(); }catch(_){}} };
+  try{ rec.start(); }catch(_){}
+}
+function stopRec(){
+  recording = false;
+  recElapsed = (Date.now()-recStart)/1000;
+  if(rec){ try{ rec.stop(); }catch(_){} }
+  if(recCallback) recCallback(sttText.trim(), recElapsed);
+  recCallback = null;
+}
+
+function speak(text, rate){
+  if(!('speechSynthesis' in window)){ toast('読み上げ非対応のブラウザです'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = rate || 0.95;
+  const v = speechSynthesis.getVoices().find(x=>/en[-_]US/i.test(x.lang)) || speechSynthesis.getVoices().find(x=>/^en/i.test(x.lang));
+  if(v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+
+// ════════════════ TEXT UTILS ════════════════
+function words(s){ return (s||'').toLowerCase().replace(/[^a-z0-9'\s]/g,' ').split(/\s+/).filter(Boolean); }
+// LCS-based matched flags for target words vs spoken
+function diffWords(target, spoken){
+  const T = words(target), S = words(spoken);
+  const n=T.length, m=S.length;
+  const dp = Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=1;i<=n;i++) for(let j=1;j<=m;j++)
+    dp[i][j] = T[i-1]===S[j-1] ? dp[i-1][j-1]+1 : Math.max(dp[i-1][j],dp[i][j-1]);
+  // backtrack to mark matched target indices
+  const matched = new Array(n).fill(false);
+  let i=n,j=m;
+  while(i>0&&j>0){
+    if(T[i-1]===S[j-1]){ matched[i-1]=true; i--;j--; }
+    else if(dp[i-1][j]>=dp[i][j-1]) i--; else j--;
+  }
+  const hit = matched.filter(Boolean).length;
+  return { T, matched, accuracy: n? Math.round(hit/n*100):0, hit, total:n };
+}
+
+// ════════════════ MODE / RENDER ════════════════
+function setMode(m){
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===m));
+  document.getElementById('wpm-sec').classList.toggle('hide', m==='phrases');
+  if(m==='repeat') renderRepeat();
+  else if(m==='interview') renderInterview();
+  else renderPhrasesMode();
+}
+
+function renderLeftList(html){ document.getElementById('left-list').innerHTML = html; }
+
+// ---- Listen & Repeat ----
+function renderRepeat(){
+  document.getElementById('chead-title').textContent = 'Listen & Repeat';
+  document.getElementById('chead-sub').textContent = '🔊で聞く → 🎤で復唱 → 自動で正答率を採点。発音とリズムを体に入れます。';
+  document.getElementById('left-label').textContent = 'レベル選択';
+  renderLeftList(REPEAT_LEVELS.map(l=>`
+    <div class="card ${l.id===curLevel.id?'active':''}" onclick="selectLevel('${l.id}')">
+      <div class="c-title">${l.name}</div>
+      <div class="c-sub">${l.desc}</div>
+    </div>`).join(''));
+  document.getElementById('right-label').textContent = 'このレベルの全文';
+  document.getElementById('model-answer').innerHTML =
+    `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">クリックで読み上げ</div>` +
+    curLevel.sentences.map((s,i)=>`<div class="card" style="margin-bottom:6px" onclick="speak(${JSON.stringify(s).replace(/"/g,'&quot;')})"><div style="font-size:12px;line-height:1.5">${i+1}. ${esc(s)}</div></div>`).join('');
+  renderRepeatStage();
+}
+function selectLevel(id){ curLevel = REPEAT_LEVELS.find(l=>l.id===id); curRepeatIdx=0; renderRepeat(); }
+function renderRepeatStage(){
+  const total = curLevel.sentences.length;
+  const sent = curLevel.sentences[curRepeatIdx];
+  document.getElementById('stage').innerHTML = `
+    <div class="repeat-target">
+      <div class="q-meta" style="justify-content:center">${curLevel.name} — ${curRepeatIdx+1} / ${total}</div>
+      <div class="rt-sentence" id="rt-sentence">${esc(sent)}</div>
+      <div class="rt-controls">
+        <button class="btn btn-blue" onclick="speak(curLevel.sentences[curRepeatIdx])">🔊 聞く</button>
+        <button class="btn btn-blue" onclick="speak(curLevel.sentences[curRepeatIdx],0.7)">🐢 ゆっくり</button>
+        <button class="btn btn-rec" id="rep-rec" onclick="toggleRepeatRec()">🎤 復唱する</button>
+      </div>
+      <div class="statusline" id="rep-status"></div>
+    </div>
+    <div class="transcript-box">
+      <div class="tb-label"><span>あなたの発話</span><span id="rep-acc"></span></div>
+      <div class="tb-text" id="rep-trans"></div>
+    </div>
+    <div style="max-width:720px;margin:0 auto;display:flex;justify-content:space-between">
+      <button class="btn btn-ghost" onclick="repeatNav(-1)" ${curRepeatIdx===0?'disabled':''}>← 前の文</button>
+      <button class="btn btn-ghost" onclick="repeatNav(1)" ${curRepeatIdx===total-1?'disabled':''}>次の文 →</button>
+    </div>`;
+}
+function repeatNav(d){ curRepeatIdx = Math.max(0, Math.min(curLevel.sentences.length-1, curRepeatIdx+d)); renderRepeatStage(); }
+function toggleRepeatRec(){
+  const btn = document.getElementById('rep-rec');
+  const status = document.getElementById('rep-status');
+  if(recording){ stopRec(); return; }
+  btn.classList.add('recording'); btn.textContent = '■ 停止';
+  status.classList.add('rec'); status.textContent = '🔴 録音中… 文を声に出して読んでください';
+  startRec('en-US',
+    (live)=>{ document.getElementById('rep-trans').textContent = live; },
+    (final, sec)=>{
+      btn.classList.remove('recording'); btn.textContent = '🎤 復唱する';
+      status.classList.remove('rec'); status.textContent = '';
+      gradeRepeat(final, sec);
+    });
+}
+function gradeRepeat(spoken, sec){
+  const target = curLevel.sentences[curRepeatIdx];
+  if(!spoken){ document.getElementById('rep-status').textContent = '聞き取れませんでした。もう一度お試しください。'; return; }
+  const d = diffWords(target, spoken);
+  // render target with hit/miss colors
+  const html = d.T.map((w,i)=>`<span class="${d.matched[i]?'w-hit':'w-miss'}">${esc(w)}</span>`).join(' ');
+  document.getElementById('rt-sentence').innerHTML = html;
+  document.getElementById('rep-trans').textContent = spoken;
+  const accEl = document.getElementById('rep-acc');
+  const col = d.accuracy>=85?'var(--green)':d.accuracy>=60?'var(--gold)':'var(--red)';
+  accEl.innerHTML = `<span style="color:${col};font-weight:700">${d.accuracy}% 一致</span>`;
+  // WPM
+  if(sec>1){ const wpm = Math.round(d.total/(sec/60)); setWpm(wpm); }
+  const msg = d.accuracy>=85?'🏆 素晴らしい！ほぼ完璧です':d.accuracy>=60?'👍 いい調子！赤い単語をもう一度':'📈 もう一度ゆっくり聞いて挑戦しよう';
+  document.getElementById('rep-status').textContent = msg;
+}
+
+// ---- Interview ----
+function renderInterview(){
+  document.getElementById('chead-title').textContent = 'Take an Interview';
+  document.getElementById('chead-sub').textContent = '質問に英語で答える本番形式。録音→自動分析で、使えたフレーズと改善点がわかります。';
+  document.getElementById('left-label').textContent = 'トピック選択';
+  renderLeftList(TOPICS.map(t=>`
+    <div class="card ${t.id===curTopic.id?'active':''}" onclick="selectTopic('${t.id}')">
+      <div class="c-title">${t.icon} ${t.title}</div>
+      <div class="c-sub">${t.sub}</div>
+    </div>`).join(''));
+  renderInterviewStage();
+}
+function selectTopic(id){ curTopic = TOPICS.find(t=>t.id===id); curQ=0; renderInterview(); }
+function renderInterviewStage(){
+  const qa = curTopic.qa[curQ];
+  const total = curTopic.qa.length;
+  const fullQ = (curQ===0 ? curTopic.intro+' ' : '') + qa.q;
+  document.getElementById('stage').innerHTML = `
+    <div class="qblock">
+      <div class="q-meta"><span>${curTopic.icon} ${curTopic.title}</span><span style="color:var(--text2)">Question ${curQ+1} / ${total}</span></div>
+      <div class="examiner">
+        ${curQ===0?`<div style="color:var(--text1);font-size:13px;margin-bottom:8px">${esc(curTopic.intro)}</div>`:''}
+        ${esc(qa.q)}
+        <div><button class="speak-q" onclick="speak(${JSON.stringify(fullQ).replace(/"/g,'&quot;')})">🔊 質問を聞く</button></div>
+      </div>
+    </div>
+    <div style="max-width:720px;margin:0 auto 14px;text-align:center">
+      <button class="btn btn-rec" id="iv-rec" onclick="toggleInterviewRec()">🎤 答えを録音する</button>
+      <span style="color:var(--text2);font-size:12px;margin-left:10px">目安：3〜5文・45〜60秒（立場 → 理由/例 → まとめ）</span>
+      <div class="statusline" id="iv-status"></div>
+    </div>
+    <div class="transcript-box">
+      <div class="tb-label"><span>あなたの解答（録音後に編集もできます）</span></div>
+      <textarea id="iv-text" placeholder="🎤で録音するか、ここに直接英語で入力できます"></textarea>
+    </div>
+    <div style="max-width:720px;margin:0 auto;display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-gold" onclick="analyzeAnswer()">📊 分析する</button>
+      <button class="btn btn-ghost" onclick="interviewNav(-1)" ${curQ===0?'disabled':''}>← 前の質問</button>
+      <button class="btn btn-ghost" onclick="interviewNav(1)" ${curQ===total-1?'disabled':''}>次の質問 →</button>
+    </div>
+    <div id="iv-feedback"></div>`;
+  renderModelAnswer(qa);
+}
+function interviewNav(d){ curQ = Math.max(0, Math.min(curTopic.qa.length-1, curQ+d)); renderInterviewStage(); }
+function toggleInterviewRec(){
+  const btn = document.getElementById('iv-rec'), status = document.getElementById('iv-status');
+  if(recording){ stopRec(); return; }
+  btn.classList.add('recording'); btn.textContent = '■ 録音停止';
+  status.classList.add('rec'); status.textContent = '🔴 録音中… 質問に英語で答えてください';
+  startRec('en-US',
+    (live)=>{ document.getElementById('iv-text').value = live; },
+    (final, sec)=>{
+      btn.classList.remove('recording'); btn.textContent='🎤 答えを録音する';
+      status.classList.remove('rec');
+      status.textContent = final? '✅ 録音完了。内容を確認して「分析する」を押してください' : '聞き取れませんでした';
+      window._lastRecSec = sec;
+    });
+}
+
+function analyzeAnswer(){
+  const text = (document.getElementById('iv-text').value||'').trim();
+  if(!text){ toast('まず録音するか、解答を入力してください'); return; }
+  const qa = curTopic.qa[curQ];
+  const W = words(text);
+  const wc = W.length;
+  const sentences = text.split(/[.!?]+/).map(s=>s.trim()).filter(s=>s.split(/\s+/).length>=2);
+  const sc = sentences.length;
+  const uniq = new Set(W).size;
+  const diversity = wc? Math.round(uniq/wc*100):0;
+  const fillers = (text.match(/\b(um+|uh+|er+|you know|kinda|sorta|i mean|basically)\b/gi)||[]).length;
+  const sec = window._lastRecSec || 0;
+  const wpm = sec>2 ? Math.round(wc/(sec/60)) : null;
+  if(wpm) setWpm(wpm);
+  // phrase detection
+  const used = PHRASE_DETECT.filter(p=>p.re.test(text));
+  const missing = PHRASE_DETECT.filter(p=>!p.re.test(text)).slice(0,4);
+  // structure
+  const hasStance = /\b(i (think|believe|prefer|would|feel)|in my opinion|for me)\b/i.test(text);
+  const hasReason = /\b(because|since|as|so that|the reason)\b/i.test(text) || used.some(u=>/example|First|because|Plus|Also/i.test(u.label));
+  const hasExample = /\b(for example|for instance|such as|like when|recently|last (week|year|semester))\b/i.test(text);
+  const hasConclusion = /\b(overall|so,? i|that'?s why|in conclusion|all in all)\b/i.test(text);
+  // heuristic scores (0-5)
+  const sFluency = clampScore( (wpm? band(wpm,90,200,110,160):3) - Math.min(2, fillers*0.5) + (sc>=3?0.5:0) );
+  const sVocab = clampScore( band(diversity,40,80,55,75) + (wc>=70?0.5:0) );
+  const sStruct = clampScore( 2 + (hasStance?1:0) + (hasReason?1:0) + (hasConclusion?1:0) + (used.length>=4?1:0) - (used.length<2?1:0) );
+  const sDevelop = clampScore( band(wc,30,110,65,100) + (hasExample?0.5:0) );
+  const overall = Math.round((sFluency+sVocab+sStruct+sDevelop)/4*10)/10;
+
+  const tag = overall>=4?'🏆 優秀':overall>=3?'👍 良好':'📈 練習を続けよう';
+  const usedChips = used.length? used.map(u=>`<span class="chip chip-green">✓ ${u.label}</span>`).join('') : '<span class="chip chip-gray">まだ使えていません</span>';
+  const missChips = missing.map(p=>`<span class="chip chip-gold">＋ ${p.label}</span>`).join('');
+  const ck = (b)=>`<span class="ck ${b?'ok':'no'}">${b?'✓':'–'}</span>`;
+  const modelId = 'fbmodel-'+Date.now();
+
+  const html = `
+  <div class="fb-card">
+    <div class="fb-head">
+      <div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">目安スコア</div><div class="score">${overall}<sub>/5</sub></div></div>
+      <div style="text-align:right"><div style="margin-bottom:4px">${tag}</div><div class="tag">ルールベース自動分析</div></div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="mv" style="color:var(--gold)">${wpm??'—'}</div><div class="ml">WPM</div></div>
+      <div class="metric"><div class="mv" style="color:var(--blue)">${wc}</div><div class="ml">語数</div></div>
+      <div class="metric"><div class="mv" style="color:var(--green)">${diversity}%</div><div class="ml">語彙の多様性</div></div>
+      <div class="metric"><div class="mv" style="color:${fillers>2?'var(--red)':'var(--text1)'}">${fillers}</div><div class="ml">filler（um/uh等）</div></div>
+    </div>
+    <div class="fb-body">
+      <div class="fb-sec"><h5>✅ 使えたフレーズ</h5>${usedChips}</div>
+      <div class="fb-sec"><h5>🎯 次に使いたいフレーズ（クリックで読み上げ）</h5>${missChips||'<span class="chip chip-gray">十分使えています！</span>'}</div>
+      <div class="fb-sec"><h5>🧱 構成チェック</h5>
+        <div class="check-row">${ck(hasStance)} 立場をはっきり示している（I think / I prefer…）</div>
+        <div class="check-row">${ck(hasReason)} 理由を述べている（because / Plus / First…）</div>
+        <div class="check-row">${ck(hasExample)} 具体例を入れている（For example / Recently…）</div>
+        <div class="check-row">${ck(hasConclusion)} まとめがある（Overall / So, I…）</div>
+      </div>
+      <div class="fb-sec"><h5>⭐ 高得点モデル解答（単語をクリックで単語帳に追加）</h5>
+        <div class="model-box markable" id="${modelId}">${esc(qa.a)}</div>
+      </div>
+      ${apiKey?`<button class="btn btn-blue" onclick="aiReview()">✨ ClaudeでさらにAI添削</button><div id="ai-review"></div>`:`<div class="note">💡 さらに細かい文法・発音の添削が欲しい場合は、右上の⚙からAPIキー（任意）を設定すると Claude添削が解放されます。</div>`}
+    </div>
+  </div>`;
+  document.getElementById('iv-feedback').innerHTML = html;
+  setTimeout(()=>{ const el=document.getElementById(modelId); if(el) makeMarkable(el); }, 50);
+  document.getElementById('iv-feedback').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function band(v,min,max,lo,hi){ // returns ~0-5: peak when within [lo,hi]
+  if(v>=lo && v<=hi) return 5;
+  if(v<lo) return Math.max(0, 5 - (lo-v)/(lo-min)*3);
+  return Math.max(0, 5 - (v-hi)/(max-hi)*3);
+}
+function clampScore(x){ return Math.max(1, Math.min(5, Math.round(x))); }
+
+function renderModelAnswer(qa){
+  document.getElementById('right-label').textContent = '高得点モデル解答';
+  const id = 'rm-'+Date.now();
+  document.getElementById('model-answer').innerHTML =
+    `<div class="q-meta" style="margin-bottom:8px">この質問の満点解答</div>
+     <div class="markable" id="${id}">${esc(qa.a)}</div>
+     <button class="btn btn-blue" style="margin-top:12px" onclick="speak(${JSON.stringify(qa.a).replace(/"/g,'&quot;')})">🔊 モデルを聞く</button>`;
+  setTimeout(()=>{ const el=document.getElementById(id); if(el) makeMarkable(el); }, 50);
+}
+
+// ---- Phrases mode ----
+function renderPhrasesMode(){
+  document.getElementById('chead-title').textContent = 'フレーズ & 語彙';
+  document.getElementById('chead-sub').textContent = 'ネイティブが多用する「型」を覚えて、Interviewで実際に使ってみましょう。';
+  document.getElementById('left-label').textContent = '練習のヒント';
+  renderLeftList(`<div class="card" onclick="setMode('interview')"><div class="c-title">🎤 Interviewで試す</div><div class="c-sub">覚えたフレーズを使うと自動で検出されます</div></div>
+    <div class="card" onclick="setMode('repeat')"><div class="c-title">🔁 Repeatで口に馴染ませる</div><div class="c-sub">同じ表現を声に出して反復</div></div>`);
+  document.getElementById('right-label').textContent = '保存した単語から';
+  document.getElementById('model-answer').innerHTML = vocab.length
+    ? vocab.slice(0,12).map(v=>`<div class="card" style="margin-bottom:6px"><div style="color:var(--gold);font-weight:600">★ ${esc(v.word)}</div><div style="font-size:11px;color:var(--text1);margin-top:3px">${esc(v.sentence)}</div></div>`).join('')
+    : '<div class="vempty">Interview/Repeatで単語をクリックすると、ここに集まります</div>';
+  const stage = document.getElementById('stage');
+  stage.innerHTML = `<div style="max-width:760px;margin:0 auto">
+    <h3 style="font-family:'Syne';font-size:16px;margin-bottom:14px;color:var(--gold)">ネイティブがよく使う表現集</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${PHRASES.map(p=>`<div class="card" onclick="speak(${JSON.stringify(p.en.replace(/~|\.\.\./g,'').trim()).replace(/"/g,'&quot;')})" style="cursor:pointer">
+        <div style="color:var(--gold);font-weight:600;font-size:13px;margin-bottom:4px">${esc(p.en)}</div>
+        <div style="font-size:12px;color:var(--text1)">${esc(p.ja)}</div></div>`).join('')}
+    </div>
+    <div class="note" style="margin-top:16px">クリックで読み上げ。これらは全トピックで使い回せる「得点フレーズ」です。Interviewタブで実際に使うと、フィードバックで✓が付きます。</div>
+  </div>`;
+}
+
+// ════════════════ AI (optional) ════════════════
+async function aiReview(){
+  const text = (document.getElementById('iv-text').value||'').trim();
+  const qa = curTopic.qa[curQ];
+  const box = document.getElementById('ai-review');
+  box.innerHTML = '<div class="note">Claudeが添削中…</div>';
+  const prompt = `あなたはTOEFL Speakingの試験官です。次の解答を日本語で添削してください。\n質問: "${qa.q}"\n高得点モデル: "${qa.a}"\n受験者の解答: "${text}"\n\n以下を簡潔に: ①良い点2つ ②直すべき文法・語法を具体的に（誤り→修正） ③もっと自然になる言い換え2つ。`;
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:900,messages:[{role:'user',content:prompt}]})
+    });
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||('HTTP '+res.status)); }
+    const d = await res.json();
+    const txt = d.content.map(c=>c.text||'').join('');
+    box.innerHTML = `<div class="model-box" style="background:var(--blue-bg);border-color:rgba(91,155,212,0.25);margin-top:10px">${esc(txt).replace(/\n/g,'<br>')}</div>`;
+  }catch(e){ box.innerHTML = `<div class="note" style="color:var(--red)">AI添削エラー: ${esc(e.message)}</div>`; }
+}
+
+// ════════════════ VOCAB ════════════════
+function makeMarkable(container){
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+  const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node=>{
+    if(node.parentNode.classList && node.parentNode.classList.contains('mw')) return;
+    const sentence = node.textContent;
+    const frag = document.createElement('span');
+    frag.innerHTML = esc(sentence).replace(/([A-Za-z][A-Za-z'-]{2,})/g,(w)=>`<span class="mw">${w}</span>`);
+    node.parentNode.replaceChild(frag, node);
+  });
+  container.querySelectorAll('.mw').forEach(sp=>{
+    sp.onclick = ()=> addVocab(sp.textContent, container.textContent);
+  });
+}
+function addVocab(word, sentence){
+  word = word.toLowerCase().replace(/[^a-z'-]/g,'');
+  if(!word || word.length<2) return;
+  if(vocab.find(v=>v.word===word)){ toast(`「${word}」は登録済みです`); return; }
+  vocab.unshift({ word, sentence:(sentence||'').slice(0,160), date:new Date().toLocaleDateString('ja-JP'), id:Date.now() });
+  saveVocab(); renderVocab(); toast(`「${word}」を単語帳に追加 ⭐`);
+}
+function removeVocab(id){ vocab = vocab.filter(v=>v.id!==id); saveVocab(); renderVocab(); }
+function saveVocab(){ localStorage.setItem('tsp_vocab', JSON.stringify(vocab)); }
+function renderVocab(){
+  document.getElementById('vcount').textContent = vocab.length;
+  document.getElementById('top-vocab').textContent = vocab.length;
+  const list = document.getElementById('vlist');
+  if(!vocab.length){ list.innerHTML = '<div class="vempty" id="vempty">単語をクリックして保存しましょう</div>'; return; }
+  list.innerHTML = vocab.map(v=>{
+    const re = new RegExp('\\b'+v.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','gi');
+    const hi = esc(v.sentence).replace(re, m=>`<mark>${m}</mark>`);
+    return `<div class="ventry"><div class="vw">★ ${esc(v.word)}</div><div class="vs">${hi}</div><button class="vd" onclick="removeVocab(${v.id})">×</button></div>`;
+  }).join('');
+}
+function toggleVocab(){
+  const b = document.getElementById('vbody'), a = document.getElementById('varrow');
+  const hidden = b.classList.toggle('hide');
+  a.textContent = hidden ? '▼' : '▲';
+}
+
+// ════════════════ MISC ════════════════
+function setWpm(n){ document.getElementById('wpm-num').textContent = n; }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg){ const e=document.createElement('div'); e.className='toast'; e.textContent=msg; document.body.appendChild(e); setTimeout(()=>e.remove(),2300); }
+function openSettings(){ document.getElementById('key-input').value = apiKey; document.getElementById('settings-modal').classList.add('show'); }
+function closeSettings(){ document.getElementById('settings-modal').classList.remove('show'); }
+function saveKey(){ apiKey = document.getElementById('key-input').value.trim(); localStorage.setItem('tsp_key', apiKey); closeSettings(); toast(apiKey?'AI添削が有効になりました':'キーを削除しました'); if(mode==='interview') renderInterviewStage(); }
+
+// init
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged = ()=>{}; }
+renderVocab();
+setMode('repeat');
+</script>
+</body>
+</html>
