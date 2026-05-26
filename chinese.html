@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国語スピーキング・トレーナー</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg0:#0b0a09; --bg1:#141210; --bg2:#1b1916; --bg3:#262320; --bg4:#332e29;
+  --line:rgba(255,255,255,0.07); --line2:rgba(255,255,255,0.12);
+  --text0:#f4f1ec; --text1:#aaa39a; --text2:#5f5a53;
+  --red:#d9534f; --red2:#f07a6e; --red-bg:rgba(217,83,79,0.12);
+  --gold:#d4a843; --gold2:#f0c870; --gold-bg:rgba(212,168,67,0.1);
+  --green:#3dba7a; --green-bg:rgba(61,186,122,0.1);
+  --blue:#5b9bd4; --blue-bg:rgba(91,155,212,0.1);
+  --purple:#9b7dd4; --purple-bg:rgba(155,125,212,0.1);
+  --r:10px; --r2:14px;
+}
+body { background:var(--bg0); color:var(--text0); font-family:'Inter','Noto Sans SC',sans-serif; font-size:14px; height:100vh; overflow:hidden; }
+button { font-family:inherit; }
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:99px; }
+.hz-font { font-family:'Noto Sans SC',sans-serif; }
+
+.app { display:grid; grid-template-rows:56px 1fr; height:100vh; }
+.topbar { background:var(--bg1); border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 18px; gap:16px; }
+.logo { font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:var(--red2); letter-spacing:-0.02em; white-space:nowrap; }
+.logo em { color:var(--text1); font-style:normal; font-weight:400; font-size:11px; margin-left:8px; }
+.tabs { flex:1; display:flex; justify-content:center; gap:5px; flex-wrap:wrap; }
+.tab { display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:100px; cursor:pointer; font-size:13px; color:var(--text2); font-weight:500; transition:all 0.15s; border:1px solid transparent; }
+.tab:hover { color:var(--text1); }
+.tab.active { background:var(--red-bg); color:var(--red2); border-color:rgba(217,83,79,0.25); }
+.top-stat { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text1); white-space:nowrap; }
+.top-stat b { font-family:'Syne',sans-serif; font-size:16px; color:var(--gold); }
+.gear { background:var(--bg2); border:1px solid var(--line2); color:var(--text1); width:34px; height:34px; border-radius:8px; cursor:pointer; font-size:15px; }
+.gear:hover { border-color:var(--red2); color:var(--red2); }
+.langlink { font-size:11px; color:var(--text2); text-decoration:none; white-space:nowrap; }
+.langlink:hover { color:var(--text1); }
+
+.body { display:grid; grid-template-columns:252px 1fr 300px; overflow:hidden; }
+.panel { background:var(--bg1); display:flex; flex-direction:column; overflow:hidden; }
+.left { border-right:1px solid var(--line); }
+.right { border-left:1px solid var(--line); }
+.psec { padding:14px 16px; border-bottom:1px solid var(--line); }
+.plabel { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--text2); margin-bottom:10px; }
+.scrolly { overflow-y:auto; flex:1; }
+.card { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:11px 12px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; }
+.card:hover { border-color:var(--line2); background:var(--bg3); }
+.card.active { border-color:var(--red2); background:var(--red-bg); }
+.card .c-title { font-size:12.5px; font-weight:500; margin-bottom:3px; }
+.card .c-sub { font-size:11px; color:var(--text2); }
+.card.active .c-sub { color:rgba(240,122,110,0.8); }
+
+.center { display:flex; flex-direction:column; overflow:hidden; }
+.chead { padding:16px 22px; border-bottom:1px solid var(--line); background:var(--bg1); }
+.chead h2 { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; }
+.chead p { font-size:12px; color:var(--text1); margin-top:3px; }
+.stage { flex:1; overflow-y:auto; padding:24px; }
+
+.q-meta { font-size:11px; color:var(--red2); font-weight:600; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:10px; justify-content:space-between; }
+.examiner { background:var(--bg2); border:1px solid var(--line); border-left:3px solid var(--red2); border-radius:4px 10px 10px 4px; padding:16px 18px; }
+.examiner .e-hz { font-family:'Noto Sans SC'; font-size:20px; line-height:1.5; }
+.examiner .e-py { font-size:13px; color:var(--gold); margin-top:6px; }
+.examiner .e-ja { font-size:12px; color:var(--text1); margin-top:4px; }
+.examiner .speak-q { background:none; border:1px solid var(--line2); color:var(--text1); border-radius:7px; padding:4px 10px; font-size:11px; cursor:pointer; margin-top:12px; display:inline-flex; align-items:center; gap:5px; }
+.examiner .speak-q:hover { border-color:var(--blue); color:var(--blue); }
+.qblock { max-width:720px; margin:0 auto 16px; }
+
+/* guide */
+.guide { max-width:720px; margin:0 auto 16px; background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; }
+.guide-head { padding:9px 14px; background:var(--red-bg); border-bottom:1px solid rgba(217,83,79,0.2); font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--red2); }
+.gstep { display:flex; gap:12px; padding:10px 16px; border-bottom:1px solid var(--line); }
+.gstep:last-child { border:none; }
+.gstep .gn { width:22px; height:22px; border-radius:50%; background:var(--bg3); border:1px solid var(--line2); color:var(--gold); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.gstep .gt { font-size:13px; font-weight:500; margin-bottom:3px; }
+.gstep .gp { font-size:12px; color:var(--text1); line-height:1.6; }
+.gstep .gp code { background:var(--gold-bg); color:var(--gold2); border-radius:4px; padding:1px 6px; font-family:'Noto Sans SC'; cursor:pointer; }
+.gstep .gp code:hover { background:rgba(212,168,67,0.25); }
+
+/* repeat target */
+.repeat-target { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r2); padding:24px; max-width:720px; margin:0 auto 18px; text-align:center; }
+.rt-hz { font-family:'Noto Sans SC'; font-size:30px; line-height:1.5; font-weight:500; letter-spacing:0.04em; }
+.rt-py { font-size:16px; color:var(--gold); margin-top:10px; }
+.rt-ja { font-size:13px; color:var(--text1); margin-top:6px; }
+.rt-controls { display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap; }
+
+.btn { border:none; border-radius:8px; padding:10px 18px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.15s; display:inline-flex; align-items:center; gap:7px; }
+.btn-red { background:var(--red); color:#fff; }
+.btn-red:hover { background:var(--red2); }
+.btn-gold { background:var(--gold); color:var(--bg0); }
+.btn-gold:hover { background:var(--gold2); }
+.btn-blue { background:var(--blue-bg); color:var(--blue); border:1px solid rgba(91,155,212,0.3); }
+.btn-blue:hover { background:rgba(91,155,212,0.2); }
+.btn-ghost { background:var(--bg3); color:var(--text1); border:1px solid var(--line2); }
+.btn-ghost:hover { border-color:var(--red2); color:var(--red2); }
+.btn:disabled { opacity:0.4; cursor:not-allowed; }
+.btn-rec { background:var(--bg3); color:var(--text1); border:1px solid var(--line2); }
+.btn-rec.recording { background:var(--red-bg); color:var(--red2); border-color:var(--red2); animation:pulse 1.1s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(217,83,79,0.4)} 50%{box-shadow:0 0 0 7px rgba(217,83,79,0)} }
+
+.char { display:inline-block; }
+.c-hit { color:var(--green); }
+.c-miss { color:var(--red2); border-bottom:2px solid var(--red); }
+
+.transcript-box { max-width:720px; margin:0 auto 16px; background:var(--bg2); border:1px solid var(--line2); border-radius:var(--r); padding:14px 16px; min-height:64px; }
+.transcript-box .tb-label { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text2); margin-bottom:8px; display:flex; justify-content:space-between; }
+.transcript-box .tb-text { font-family:'Noto Sans SC'; font-size:18px; line-height:1.7; color:var(--text0); }
+.transcript-box .tb-text:empty::before { content:'録音すると、ここに認識結果が表示されます'; color:var(--text2); font-style:italic; font-family:'Inter'; font-size:13px; }
+.transcript-box textarea { width:100%; background:transparent; border:none; color:var(--text0); font-family:'Noto Sans SC'; font-size:17px; line-height:1.7; resize:vertical; min-height:50px; outline:none; }
+
+.statusline { font-size:11px; color:var(--text2); text-align:center; min-height:16px; margin-top:10px; }
+.statusline.rec { color:var(--red2); }
+
+/* feedback */
+.fb-card { max-width:720px; margin:18px auto 0; background:var(--bg1); border:1px solid var(--line); border-radius:var(--r2); overflow:hidden; }
+.fb-head { padding:16px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; }
+.fb-head .score { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; color:var(--gold); line-height:1; }
+.fb-head .score sub { font-size:15px; color:var(--text2); font-weight:400; font-family:'Inter'; }
+.metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); }
+.metric { background:var(--bg1); padding:12px 8px; text-align:center; }
+.metric .mv { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; }
+.metric .ml { font-size:10px; color:var(--text2); margin-top:3px; }
+.fb-body { padding:16px 20px; }
+.fb-sec { margin-bottom:16px; }
+.fb-sec:last-child { margin-bottom:0; }
+.fb-sec h5 { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--red2); margin-bottom:9px; }
+.chip { display:inline-block; font-size:12px; padding:4px 11px; border-radius:99px; margin:3px 4px 3px 0; font-family:'Noto Sans SC'; }
+.chip-green { background:var(--green-bg); color:var(--green); border:1px solid rgba(61,186,122,0.25); }
+.chip-gold { background:var(--gold-bg); color:var(--gold); border:1px solid rgba(212,168,67,0.25); }
+.chip-gray { background:var(--bg3); color:var(--text2); border:1px solid var(--line); }
+.check-row { display:flex; align-items:center; gap:9px; font-size:13px; padding:5px 0; color:var(--text1); }
+.check-row .ck { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+.ck.ok { background:var(--green-bg); color:var(--green); border:1px solid rgba(61,186,122,0.3); }
+.ck.no { background:var(--bg3); color:var(--text2); border:1px solid var(--line2); }
+.model-box { background:var(--green-bg); border:1px solid rgba(61,186,122,0.2); border-radius:8px; padding:14px 16px; }
+.model-box .m-hz { font-family:'Noto Sans SC'; font-size:17px; line-height:1.9; }
+.model-box .m-ja { font-size:12px; color:var(--text1); margin-top:8px; line-height:1.6; }
+.note { font-size:11px; color:var(--text2); margin-top:8px; line-height:1.5; }
+
+/* right model + phrases */
+.model-answer { padding:14px 16px; }
+.model-answer .m-hz { font-family:'Noto Sans SC'; font-size:16px; line-height:1.9; }
+.model-answer .m-ja { font-size:12px; color:var(--text1); margin-top:8px; line-height:1.6; }
+.phrase-item { padding:8px 0; border-bottom:1px solid var(--line); line-height:1.5; }
+.phrase-item:last-child { border:none; }
+.phrase-item .ph-hz { font-family:'Noto Sans SC'; font-size:14px; color:var(--gold); font-weight:500; }
+.phrase-item .ph-py { font-size:11px; color:var(--text2); }
+.phrase-item .ph-ja { font-size:11px; color:var(--text1); }
+
+/* phrase bank */
+.cat { margin-bottom:18px; }
+.cat h4 { font-size:12px; color:var(--red2); margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.cat h4 .badge { background:var(--red-bg); color:var(--red2); border:1px solid rgba(217,83,79,0.3); border-radius:99px; font-size:10px; padding:1px 8px; }
+.pcard { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.pcard .pe { font-family:'Noto Sans SC'; font-size:15px; color:var(--text0); font-weight:500; }
+.pcard .ppy { font-size:11px; color:var(--gold); margin-top:2px; }
+.pcard .pj { font-size:11px; color:var(--text2); margin-top:1px; }
+.pcard .pacts { display:flex; gap:6px; flex-shrink:0; }
+.pmini { background:var(--bg3); border:1px solid var(--line2); color:var(--text1); border-radius:6px; padding:4px 8px; font-size:11px; cursor:pointer; }
+.pmini:hover { border-color:var(--gold); color:var(--gold); }
+
+/* forms */
+.form-wrap { max-width:680px; margin:0 auto; }
+.form-card { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r2); padding:18px 20px; margin-bottom:18px; }
+.form-card h3 { font-family:'Syne'; font-size:15px; color:var(--red2); margin-bottom:4px; }
+.form-card .sub { font-size:11px; color:var(--text2); margin-bottom:12px; }
+.field { margin-bottom:10px; }
+.field label { font-size:11px; color:var(--text1); display:block; margin-bottom:4px; }
+.field input, .field textarea, .field select { width:100%; background:var(--bg3); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:'Noto Sans SC','Inter'; font-size:14px; padding:9px 12px; outline:none; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color:var(--red2); }
+.field textarea { resize:vertical; min-height:60px; line-height:1.6; }
+.form-actions { display:flex; gap:8px; margin-top:12px; }
+.user-item { background:var(--bg3); border:1px solid var(--line); border-radius:8px; padding:9px 12px; margin-bottom:6px; position:relative; }
+.user-item .ui-hz { font-family:'Noto Sans SC'; font-size:14px; }
+.user-item .ui-meta { font-size:11px; color:var(--text2); margin-top:2px; }
+.user-item .ui-del { position:absolute; top:8px; right:10px; background:none; border:none; color:var(--text2); font-size:15px; cursor:pointer; }
+.user-item .ui-del:hover { color:var(--red2); }
+.eg { font-size:11px; color:var(--text2); margin-top:6px; line-height:1.5; }
+
+/* vocab */
+.vocab-head { padding:10px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; border-top:1px solid var(--line); }
+.vocab-head:hover { background:var(--bg2); }
+.vcount { background:var(--gold-bg); color:var(--gold); border:1px solid rgba(212,168,67,0.3); border-radius:99px; font-size:10px; font-weight:700; padding:1px 7px; min-width:20px; text-align:center; }
+.vlist { max-height:220px; overflow-y:auto; padding:6px 12px 12px; }
+.ventry { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:6px; position:relative; }
+.ventry .vw { font-family:'Noto Sans SC'; font-weight:600; color:var(--gold); font-size:15px; }
+.ventry .vp { font-size:11px; color:var(--text2); }
+.ventry .vj { font-size:11px; color:var(--text1); margin-top:2px; }
+.ventry .vd { position:absolute; top:6px; right:8px; background:none; border:none; color:var(--text2); font-size:14px; cursor:pointer; }
+.ventry .vd:hover { color:var(--red2); }
+.vempty { font-size:12px; color:var(--text2); text-align:center; padding:14px; line-height:1.6; }
+
+.custom-wrap { max-width:680px; margin:0 auto; }
+.custom-wrap label { font-size:12px; color:var(--text1); display:block; margin:14px 0 6px; }
+.custom-wrap input, .custom-wrap textarea { width:100%; background:var(--bg2); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:'Noto Sans SC','Inter'; font-size:14px; padding:11px 14px; outline:none; }
+.custom-wrap input:focus, .custom-wrap textarea:focus { border-color:var(--red2); }
+.custom-wrap textarea { resize:vertical; min-height:80px; line-height:1.6; }
+
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--line2); border-radius:8px; padding:9px 18px; font-size:12px; color:var(--gold); z-index:400; box-shadow:0 6px 24px rgba(0,0,0,0.4); }
+.modal-bg { position:fixed; inset:0; background:rgba(11,10,9,0.85); z-index:500; display:none; align-items:center; justify-content:center; }
+.modal-bg.show { display:flex; }
+.modal { background:var(--bg2); border:1px solid var(--line2); border-radius:16px; padding:28px; max-width:440px; width:90%; }
+.modal h3 { font-family:'Syne'; font-size:18px; color:var(--red2); margin-bottom:6px; }
+.modal p { font-size:12.5px; color:var(--text1); line-height:1.7; margin-bottom:16px; }
+.modal input { width:100%; background:var(--bg3); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:inherit; font-size:13px; padding:10px 13px; outline:none; margin-bottom:14px; }
+.modal input:focus { border-color:var(--red2); }
+.modal-row { display:flex; gap:8px; }
+.hide { display:none !important; }
+.wpm-mini { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:11px 13px; }
+.wpm-mini .n { font-family:'Syne',sans-serif; font-size:26px; font-weight:700; color:var(--blue); }
+.wpm-mini .l { font-size:10px; color:var(--text2); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">中文 Speaking <em>話す中国語トレーナー</em></div>
+    <div class="tabs">
+      <div class="tab active" data-mode="repeat" onclick="setMode('repeat')">🔁 跟读（復唱）</div>
+      <div class="tab" data-mode="interview" onclick="setMode('interview')">🎤 会話練習</div>
+      <div class="tab" data-mode="custom" onclick="setMode('custom')">🎬 自由テーマ</div>
+      <div class="tab" data-mode="phrases" onclick="setMode('phrases')">💬 フレーズ＆語彙</div>
+      <div class="tab" data-mode="add" onclick="setMode('add')">➕ 追加</div>
+    </div>
+    <div class="top-stat"><span>単語帳</span><b id="top-vocab">0</b></div>
+    <a class="langlink" href="index.html" title="英語版へ">EN/TOEFL版</a>
+    <button class="gear" onclick="openSettings()" title="設定（任意のAI補完キー）">⚙</button>
+  </div>
+  <div class="body">
+    <div class="panel left">
+      <div class="psec"><div class="plabel" id="left-label">レベル選択</div><div id="left-list"></div></div>
+      <div class="psec" id="wpm-sec">
+        <div class="plabel">直近の話速</div>
+        <div class="wpm-mini"><div class="n" id="wpm-num">—</div><div class="l">字 / 分（characters per minute）</div></div>
+      </div>
+      <div class="scrolly"></div>
+    </div>
+    <div class="panel center">
+      <div class="chead"><h2 id="chead-title">跟读（復唱）</h2><p id="chead-sub">聞いて、声に出して真似る。発音とリズムを体に入れます。</p></div>
+      <div class="stage" id="stage"></div>
+    </div>
+    <div class="panel right">
+      <div class="psec"><div class="plabel" id="right-label">モデル解答</div><div style="font-size:11px;color:var(--text2)">🔊で発音を確認</div></div>
+      <div class="scrolly">
+        <div class="model-answer" id="model-answer"></div>
+        <div class="psec" style="border-top:1px solid var(--line)"><div class="plabel">よく使う表現</div><div id="phrase-list"></div></div>
+      </div>
+      <div class="vocab-head" onclick="toggleVocab()">
+        <div style="display:flex;align-items:center;gap:8px"><span class="plabel" style="margin:0">単語帳</span><span class="vcount" id="vcount">0</span></div>
+        <span id="varrow" style="font-size:11px;color:var(--text2)">▲</span>
+      </div>
+      <div id="vbody"><div class="vlist" id="vlist"><div class="vempty" id="vempty">フレーズや文を保存しましょう</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="settings-modal">
+  <div class="modal">
+    <h3>AI補完（任意）</h3>
+    <p>このアプリはAPIキーなしで全機能が動きます。「追加」画面で漢字からピンインと日本語訳を自動補完したい場合のみ、Anthropic APIキーを入力してください。キーはこの端末にのみ保存されます。</p>
+    <input type="password" id="key-input" placeholder="sk-ant-... （任意。空欄でOK）" />
+    <div class="modal-row">
+      <button class="btn btn-gold" style="flex:1" onclick="saveKey()">保存</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeSettings()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════ BUILT-IN DATA ════════
+const REPEAT_LEVELS = [
+  { id:'L1', name:'Level 1 基礎 (HSK1-2)', desc:'短い単文。発音とリズムの土台。', sentences:[
+    {hz:"我喜欢喝茶。", py:"Wǒ xǐhuān hē chá.", ja:"私はお茶を飲むのが好きです。"},
+    {hz:"今天天气很好。", py:"Jīntiān tiānqì hěn hǎo.", ja:"今日は天気がいいです。"},
+    {hz:"我每天都去上班。", py:"Wǒ měi tiān dōu qù shàngbān.", ja:"私は毎日仕事に行きます。"},
+    {hz:"这个菜很好吃。", py:"Zhège cài hěn hǎochī.", ja:"この料理はとても美味しいです。"},
+    {hz:"我想学习中文。", py:"Wǒ xiǎng xuéxí Zhōngwén.", ja:"私は中国語を勉強したいです。"},
+    {hz:"周末我喜欢看电影。", py:"Zhōumò wǒ xǐhuān kàn diànyǐng.", ja:"週末は映画を見るのが好きです。"}
+  ]},
+  { id:'L2', name:'Level 2 標準 (HSK3)', desc:'接続表現でつなぐ。因为/虽然/的时候。', sentences:[
+    {hz:"因为下雨，所以我没去公园。", py:"Yīnwèi xiàyǔ, suǒyǐ wǒ méi qù gōngyuán.", ja:"雨が降ったので、公園に行きませんでした。"},
+    {hz:"我学中文，因为我喜欢中国文化。", py:"Wǒ xué Zhōngwén, yīnwèi wǒ xǐhuān Zhōngguó wénhuà.", ja:"中国文化が好きなので中国語を学んでいます。"},
+    {hz:"有空的时候，我喜欢听音乐。", py:"Yǒu kòng de shíhòu, wǒ xǐhuān tīng yīnyuè.", ja:"暇なとき、音楽を聞くのが好きです。"},
+    {hz:"这家餐厅不但便宜，而且很好吃。", py:"Zhè jiā cāntīng búdàn piányí, érqiě hěn hǎochī.", ja:"このレストランは安いだけでなく美味しいです。"},
+    {hz:"虽然很累，但是我很开心。", py:"Suīrán hěn lèi, dànshì wǒ hěn kāixīn.", ja:"疲れたけれど、とても楽しいです。"},
+    {hz:"如果有时间，我想去旅游。", py:"Rúguǒ yǒu shíjiān, wǒ xiǎng qù lǚyóu.", ja:"時間があれば旅行に行きたいです。"}
+  ]},
+  { id:'L3', name:'Level 3 応用 (HSK4)', desc:'把/被構文・程度補語など。', sentences:[
+    {hz:"我把作业做完了。", py:"Wǒ bǎ zuòyè zuò wán le.", ja:"私は宿題をやり終えました。"},
+    {hz:"他被老师表扬了。", py:"Tā bèi lǎoshī biǎoyáng le.", ja:"彼は先生に褒められました。"},
+    {hz:"我越来越喜欢这个城市了。", py:"Wǒ yuèláiyuè xǐhuān zhège chéngshì le.", ja:"この街がますます好きになってきました。"},
+    {hz:"他说中文说得很流利。", py:"Tā shuō Zhōngwén shuō de hěn liúlì.", ja:"彼は中国語をとても流暢に話します。"},
+    {hz:"只要努力，就一定会成功。", py:"Zhǐyào nǔlì, jiù yídìng huì chénggōng.", ja:"努力さえすれば、必ず成功します。"},
+    {hz:"这本书我看得懂。", py:"Zhè běn shū wǒ kàn de dǒng.", ja:"この本は読んで理解できます。"}
+  ]},
+  { id:'L4', name:'Level 4 上級 (HSK5-6)', desc:'複雑な構文・書き言葉的表現。', sentences:[
+    {hz:"随着科技的发展，我们的生活越来越方便。", py:"Suízhe kējì de fāzhǎn, wǒmen de shēnghuó yuèláiyuè fāngbiàn.", ja:"科学技術の発展に伴い、生活はますます便利になっています。"},
+    {hz:"无论遇到什么困难，我都不会轻易放弃。", py:"Wúlùn yùdào shénme kùnnán, wǒ dōu bú huì qīngyì fàngqì.", ja:"どんな困難に遭っても、簡単には諦めません。"},
+    {hz:"这部电影不仅情节精彩，而且引人深思。", py:"Zhè bù diànyǐng bùjǐn qíngjié jīngcǎi, érqiě yǐn rén shēnsī.", ja:"この映画は筋が面白いだけでなく、深く考えさせられます。"},
+    {hz:"与其抱怨环境，不如改变自己。", py:"Yǔqí bàoyuàn huánjìng, bùrú gǎibiàn zìjǐ.", ja:"環境に文句を言うより、自分を変えるほうがよい。"},
+    {hz:"在我看来，保持好奇心是不断成长的关键。", py:"Zài wǒ kànlái, bǎochí hàoqíxīn shì búduàn chéngzhǎng de guānjiàn.", ja:"私の考えでは、好奇心を保つことが成長し続ける鍵です。"}
+  ]}
+];
+
+const TOPICS = [
+  { id:'food', icon:'🍜', title:'レストラン・美食', sub:'餐厅与美食',
+    intro:{hz:"今天我想问你一些关于餐厅和美食的问题。", py:"Jīntiān wǒ xiǎng wèn nǐ yìxiē guānyú cāntīng hé měishí de wèntí.", ja:"今日はレストランと食べ物について質問します。"},
+    qa:[
+      {q:{hz:"你能描述一次让你印象深刻的用餐经历吗？", py:"Nǐ néng miáoshù yí cì ràng nǐ yìnxiàng shēnkè de yòngcān jīnglì ma?", ja:"印象に残っている食事の経験を説明できますか？"},
+       a:{hz:"让我印象最深的一次是在一家小小的中餐馆。那里的菜又新鲜又好吃，服务员也很热情。我和家人一边吃饭一边聊天，感觉特别温暖。所以，那次经历让我很难忘。", ja:"一番印象的だったのは小さな中華料理店です。料理は新鮮で美味しく、店員も親切でした。家族と食事しながら話して、とても温かい気持ちでした。だから忘れられない経験です。"}},
+      {q:{hz:"和朋友吃饭的时候，你更喜欢去熟悉的餐厅，还是尝试新的地方？", py:"Hé péngyǒu chīfàn de shíhòu, nǐ gèng xǐhuān qù shúxī de cāntīng, háishì chángshì xīn de dìfāng?", ja:"友人と食事するとき、馴染みの店と新しい店、どちらが好きですか？"},
+       a:{hz:"我更喜欢尝试新的地方。因为这样可以发现新的口味，也能和朋友一起体验新鲜的感觉。虽然有时候味道不一定合适，但是探索的过程很有意思。所以，我觉得尝试新餐厅更有乐趣。", ja:"新しい店を試すほうが好きです。新しい味を発見でき、友人と新鮮な体験を共有できるからです。たまに口に合わないこともありますが、探す過程が面白いです。だから新しい店のほうが楽しいと思います。"}},
+      {q:{hz:"你觉得点外卖会比在餐厅吃饭更受欢迎吗？为什么？", py:"Nǐ juéde diǎn wàimài huì bǐ zài cāntīng chīfàn gèng shòu huānyíng ma? Wèishéme?", ja:"出前は店内飲食より人気が出ると思いますか？なぜ？"},
+       a:{hz:"我觉得点外卖会越来越受欢迎。因为现在大家工作都很忙，在家点外卖更方便。而且手机应用很发达，几分钟就能下单。不过，我认为餐厅的气氛是外卖代替不了的。", ja:"出前はますます人気が出ると思います。皆忙しく、家で頼むほうが便利だからです。アプリも発達して数分で注文できます。ただ、店の雰囲気は出前では代えられないと思います。"}}
+    ]},
+  { id:'language', icon:'🗣️', title:'語学学習', sub:'学习语言',
+    intro:{hz:"今天我想问你一些关于学习语言的问题。", py:"Jīntiān wǒ xiǎng wèn nǐ yìxiē guānyú xuéxí yǔyán de wèntí.", ja:"今日は語学学習について質問します。"},
+    qa:[
+      {q:{hz:"你能说说你学习一门外语的方法吗？", py:"Nǐ néng shuōshuo nǐ xuéxí yì mén wàiyǔ de fāngfǎ ma?", ja:"外国語を学ぶ方法について話せますか？"},
+       a:{hz:"我学外语的方法是每天听和说。我觉得最有效的是多跟母语者交流，因为这样能提高发音和听力。最困难的是坚持，但是只要每天练习一点，就会进步。", ja:"私の方法は毎日聞いて話すことです。一番効果的なのはネイティブと多く交流することです。発音と聴解が上がるからです。難しいのは継続ですが、毎日少しずつ練習すれば上達します。"}},
+      {q:{hz:"你觉得跟母语者练习更有效，还是自己用书本学习更有效？", py:"Nǐ juéde gēn mǔyǔ zhě liànxí gèng yǒuxiào, háishì zìjǐ yòng shūběn xuéxí gèng yǒuxiào?", ja:"ネイティブとの練習と独学、どちらが効果的だと思いますか？"},
+       a:{hz:"在我看来，跟母语者练习更有效。因为可以学到真实的表达和语气，也能增加自信。虽然书本和应用很方便，但是缺少真正的交流。所以我更喜欢和真人对话。", ja:"私の考えでは、ネイティブとの練習が効果的です。本物の表現や語気が学べ、自信もつくからです。本やアプリは便利ですが、本当の交流が足りません。だから生の会話が好きです。"}},
+      {q:{hz:"你觉得以后大家会更多地用科技来学习语言吗？", py:"Nǐ juéde yǐhòu dàjiā huì gèng duō de yòng kējì lái xuéxí yǔyán ma?", ja:"今後はもっとテクノロジーで語学を学ぶようになると思いますか？"},
+       a:{hz:"我觉得会的。随着科技的发展，学习应用越来越聪明，可以根据每个人的水平来安排内容。而且在线交流也很方便。所以我相信科技会让学习语言更轻松。", ja:"そう思います。技術の発展でアプリは賢くなり、各自のレベルに合わせて内容を調整できます。オンライン交流も便利です。だから技術は語学学習をもっと楽にすると思います。"}}
+    ]},
+  { id:'travel', icon:'✈️', title:'旅行', sub:'旅行',
+    intro:{hz:"今天我想问你一些关于旅行的问题。", py:"Jīntiān wǒ xiǎng wèn nǐ yìxiē guānyú lǚxíng de wèntí.", ja:"今日は旅行について質問します。"},
+    qa:[
+      {q:{hz:"你能描述一次让你难忘的旅行吗？", py:"Nǐ néng miáoshù yí cì ràng nǐ nánwàng de lǚxíng ma?", ja:"忘れられない旅行を説明できますか？"},
+       a:{hz:"我最难忘的一次旅行是去云南。那里的风景非常美，空气也很新鲜。我尝了很多当地的美食，还认识了一些新朋友。所以，那次旅行让我特别开心。", ja:"一番忘れられない旅行は雲南です。景色がとても美しく、空気も新鮮でした。たくさん現地の料理を味わい、新しい友人もできました。だからとても楽しい旅でした。"}},
+      {q:{hz:"你旅行的时候喜欢提前做好计划，还是随意一点？", py:"Nǐ lǚxíng de shíhòu xǐhuān tíqián zuò hǎo jìhuà, háishì suíyì yìdiǎn?", ja:"旅行は事前に計画する派？それとも気まま派？"},
+       a:{hz:"我旅行的时候更喜欢提前做计划。因为这样可以节省时间，也不会错过重要的景点。不过，我也会留一点自由的时间，去发现意外的惊喜。所以，我觉得有计划又有弹性最好。", ja:"私は事前に計画するほうが好きです。時間を節約でき、大事な観光地を逃さないからです。ただ、自由な時間も少し残して意外な発見を楽しみます。だから計画と柔軟さの両方が一番だと思います。"}},
+      {q:{hz:"你觉得以后人们会更喜欢出国旅行，还是在国内旅行？", py:"Nǐ juéde yǐhòu rénmen huì gèng xǐhuān chūguó lǚxíng, háishì zài guónèi lǚxíng?", ja:"今後は海外旅行と国内旅行、どちらが好まれると思いますか？"},
+       a:{hz:"我觉得这要看情况。出国旅行可以体验不同的文化，但是国内旅行更方便也更便宜。随着高铁越来越发达，我相信国内旅行会越来越受欢迎。", ja:"状況によると思います。海外旅行は異文化を体験できますが、国内旅行は便利で安いです。高速鉄道の発達につれ、国内旅行はますます人気になると思います。"}}
+    ]}
+];
+
+const PHRASE_BANK = [
+  { cat:'① 意見・立場', items:[
+    {hz:"我觉得…", py:"wǒ juéde…", ja:"私は…と思う"},
+    {hz:"我认为…", py:"wǒ rènwéi…", ja:"私は…と考える（やや硬め）"},
+    {hz:"在我看来，…", py:"zài wǒ kànlái,…", ja:"私の見方では…"},
+    {hz:"对我来说，…", py:"duì wǒ lái shuō,…", ja:"私にとって…"}
+  ]},
+  { cat:'② 理由・追加', items:[
+    {hz:"因为…所以…", py:"yīnwèi…suǒyǐ…", ja:"…だから…"},
+    {hz:"不但…而且…", py:"búdàn…érqiě…", ja:"…だけでなく…も"},
+    {hz:"而且", py:"érqiě", ja:"しかも"},
+    {hz:"另外", py:"lìngwài", ja:"そのほか／別に"}
+  ]},
+  { cat:'③ 具体例', items:[
+    {hz:"比如说，…", py:"bǐrú shuō,…", ja:"例えば…"},
+    {hz:"例如", py:"lìrú", ja:"例えば（硬め）"},
+    {hz:"像…一样", py:"xiàng…yíyàng", ja:"…のように"}
+  ]},
+  { cat:'④ 対比・譲歩', items:[
+    {hz:"虽然…但是…", py:"suīrán…dànshì…", ja:"…だけれど…"},
+    {hz:"不过", py:"búguò", ja:"でも／ただし"},
+    {hz:"其实", py:"qíshí", ja:"実は"}
+  ]},
+  { cat:'⑤ まとめ', items:[
+    {hz:"总的来说，…", py:"zǒng de lái shuō,…", ja:"総じて言えば…"},
+    {hz:"所以", py:"suǒyǐ", ja:"だから"},
+    {hz:"总之", py:"zǒngzhī", ja:"要するに"}
+  ]},
+  { cat:'⑥ 会話の潤滑', items:[
+    {hz:"怎么说呢，…", py:"zěnme shuō ne,…", ja:"なんて言うか…"},
+    {hz:"我先说一下…", py:"wǒ xiān shuō yíxià…", ja:"まず少し述べると…"},
+    {hz:"你觉得呢？", py:"nǐ juéde ne?", ja:"あなたはどう思う？"}
+  ]}
+];
+
+const GUIDES = [
+  { type:'体験を語る (描述)', steps:[
+    { t:'結論を先に', p:'<code>让我印象最深的是…</code>（一番印象的なのは…）' },
+    { t:'詳しく描写', p:'いつ・どこで・何が良かったか。<code>那里的…又…又…</code>' },
+    { t:'気持ち・理由', p:'<code>我觉得…</code> / <code>感觉特别…</code>' },
+    { t:'まとめ', p:'<code>所以，那次…让我很难忘。</code>' }
+  ]},
+  { type:'好み A or B (选择)', steps:[
+    { t:'立場を即答', p:'<code>我更喜欢…</code>（私は…のほうが好き）' },
+    { t:'理由1', p:'<code>因为…</code>（なぜなら…）' },
+    { t:'理由2＋例', p:'<code>而且…</code> / <code>比如说…</code>' },
+    { t:'まとめ', p:'<code>所以，我觉得…更…</code>' }
+  ]},
+  { type:'意見・賛否 (看法)', steps:[
+    { t:'立場を明確に', p:'<code>我觉得…应该…</code>' },
+    { t:'理由', p:'<code>因为…</code> / <code>这样可以…</code>' },
+    { t:'譲歩で厚みを', p:'<code>虽然…但是…</code>（…だけど…）' },
+    { t:'まとめ', p:'<code>总的来说，…</code>' }
+  ]},
+  { type:'未来予測 (预测)', steps:[
+    { t:'予測を述べる', p:'<code>我觉得…会越来越…</code>' },
+    { t:'理由（流れ・技術）', p:'<code>随着…的发展，…</code>' },
+    { t:'理由2＋例', p:'<code>而且…</code> / <code>比如…</code>' },
+    { t:'まとめ', p:'<code>所以我相信…</code>' }
+  ]}
+];
+
+// ════════ STATE ════════
+let mode='repeat';
+let apiKey = localStorage.getItem('zh_key') || '';
+let vocab = JSON.parse(localStorage.getItem('zh_vocab') || '[]');
+let curLevelId = 'L1', curRepeatIdx = 0;
+let curTopicId = 'food', curQ = 0;
+let customTopic = null;
+let rec=null, recording=false, sttText='', recStart=0, recElapsed=0, recCallback=null;
+
+// ════════ DATA MERGE (built-in + user) ════════
+function uget(key){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(_){ return []; } }
+function getLevels(){
+  const u = (()=>{ try{ return JSON.parse(localStorage.getItem('zh_userRepeat')||'{}'); }catch(_){ return {}; } })();
+  return REPEAT_LEVELS.map(l=>({ ...l, sentences:[...l.sentences, ...((u[l.id]||[]))] }));
+}
+function getLevel(id){ return getLevels().find(l=>l.id===id) || getLevels()[0]; }
+function getTopics(){ return [...TOPICS, ...uget('zh_userTopics')]; }
+function getTopic(id){
+  if(id==='__custom__') return customTopic;
+  return getTopics().find(t=>t.id===id) || getTopics()[0];
+}
+function getPhraseBank(){
+  const up = uget('zh_userPhrases');
+  const bank = PHRASE_BANK.map(c=>({ cat:c.cat, items:c.items.slice() }));
+  if(up.length) bank.push({ cat:'⭐ 自分で追加', items:up });
+  return bank;
+}
+function flatPhrases(){ return getPhraseBank().flatMap(c=>c.items); }
+
+// ════════ SPEECH ════════
+function sttSupported(){ return ('SpeechRecognition' in window)||('webkitSpeechRecognition' in window); }
+function startRec(onLive, onDone){
+  if(!sttSupported()){ toast('音声入力はChrome/Edgeに対応しています'); if(onDone) onDone('',0); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  rec = new SR(); rec.lang='zh-CN'; rec.continuous=true; rec.interimResults=true; rec.maxAlternatives=1;
+  sttText=''; recStart=Date.now(); recording=true; recCallback=onDone;
+  rec.onresult=(e)=>{ let interim='', fin=sttText;
+    for(let i=e.resultIndex;i<e.results.length;i++){ const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) fin += t; else interim += t; }
+    sttText=fin; if(onLive) onLive(sttText+interim); };
+  rec.onerror=(e)=>{ if(e.error==='no-speech'||e.error==='aborted') return; toast('音声エラー: '+e.error); };
+  rec.onend=()=>{ if(recording){ try{ rec.start(); }catch(_){} } };
+  try{ rec.start(); }catch(_){}
+}
+function stopRec(){ recording=false; recElapsed=(Date.now()-recStart)/1000; if(rec){ try{ rec.stop(); }catch(_){} }
+  if(recCallback) recCallback(sttText.trim(), recElapsed); recCallback=null; }
+function speak(text, rate){
+  if(!('speechSynthesis' in window)){ toast('読み上げ非対応のブラウザです'); return; }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.lang='zh-CN'; u.rate=rate||0.9;
+  const vs=speechSynthesis.getVoices();
+  const v=vs.find(x=>/zh[-_]CN/i.test(x.lang))||vs.find(x=>/^zh/i.test(x.lang));
+  if(v) u.voice=v; speechSynthesis.speak(u);
+}
+
+// ════════ TEXT UTILS ════════
+const CJK = /[一-鿿]/;
+function cjkChars(s){ return (s||'').split('').filter(c=>CJK.test(c)); }
+function charDiff(target, spoken){
+  const T=cjkChars(target), S=cjkChars(spoken), n=T.length, m=S.length;
+  const dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=1;i<=n;i++) for(let j=1;j<=m;j++)
+    dp[i][j]=T[i-1]===S[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+  const matched=new Array(n).fill(false); let i=n,j=m;
+  while(i>0&&j>0){ if(T[i-1]===S[j-1]){ matched[i-1]=true; i--;j--; } else if(dp[i-1][j]>=dp[i][j-1]) i--; else j--; }
+  const hit=matched.filter(Boolean).length;
+  return { matched, accuracy:n?Math.round(hit/n*100):0, hit, total:n };
+}
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function aq(s){ return JSON.stringify(s).replace(/"/g,'&quot;'); }
+
+// ════════ MODE ════════
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===m));
+  document.getElementById('wpm-sec').classList.toggle('hide', m==='phrases'||m==='add');
+  if(m==='repeat') renderRepeat();
+  else if(m==='interview') renderInterview();
+  else if(m==='custom') renderCustom();
+  else if(m==='phrases') renderPhrasesMode();
+  else if(m==='add') renderAddMode();
+}
+function renderLeftList(html){ document.getElementById('left-list').innerHTML=html; }
+
+// ════════ REPEAT ════════
+function renderRepeat(){
+  document.getElementById('chead-title').textContent='跟读（復唱）';
+  document.getElementById('chead-sub').textContent='🔊で聞く → 🎤で復唱 → 文字一致を自動採点。ピンインを見ながら発音を真似ましょう。';
+  document.getElementById('left-label').textContent='レベル選択';
+  renderLeftList(getLevels().map(l=>`<div class="card ${l.id===curLevelId?'active':''}" onclick="selectLevel('${l.id}')"><div class="c-title">${esc(l.name)}</div><div class="c-sub">${esc(l.desc||'自分で追加した文')}</div></div>`).join(''));
+  const lvl=getLevel(curLevelId);
+  document.getElementById('right-label').textContent='このレベルの全文';
+  document.getElementById('model-answer').innerHTML = lvl.sentences.length
+    ? lvl.sentences.map((s,i)=>`<div class="card" style="margin-bottom:6px" onclick="speak(${aq(s.hz)})"><div class="hz-font" style="font-size:15px">${i+1}. ${esc(s.hz)}</div><div style="font-size:11px;color:var(--gold);margin-top:2px">${esc(s.py||'')}</div></div>`).join('')
+    : '<div class="vempty">この レベルには文がありません。<br>「➕ 追加」から増やせます。</div>';
+  renderPhraseListPanel();
+  if(curRepeatIdx>=lvl.sentences.length) curRepeatIdx=0;
+  renderRepeatStage();
+}
+function selectLevel(id){ curLevelId=id; curRepeatIdx=0; renderRepeat(); }
+function renderRepeatStage(){
+  const lvl=getLevel(curLevelId), total=lvl.sentences.length;
+  if(!total){ document.getElementById('stage').innerHTML='<div class="vempty">文がありません。「➕ 追加」から登録してください。</div>'; return; }
+  const s=lvl.sentences[curRepeatIdx];
+  document.getElementById('stage').innerHTML=`
+    <div class="repeat-target">
+      <div class="q-meta" style="justify-content:center">${esc(lvl.name)} — ${curRepeatIdx+1} / ${total}</div>
+      <div class="rt-hz" id="rt-hz">${esc(s.hz)}</div>
+      <div class="rt-py">${esc(s.py||'')}</div>
+      <div class="rt-ja">${esc(s.ja||'')}</div>
+      <div class="rt-controls">
+        <button class="btn btn-blue" onclick="speak(${aq(s.hz)})">🔊 聞く</button>
+        <button class="btn btn-blue" onclick="speak(${aq(s.hz)},0.6)">🐢 ゆっくり</button>
+        <button class="btn btn-rec" id="rep-rec" onclick="toggleRepeatRec()">🎤 復唱する</button>
+        <button class="btn btn-ghost" onclick="saveSentenceVocab(${aq(s.hz)},${aq(s.py||'')},${aq(s.ja||'')})">＋ 保存</button>
+      </div>
+      <div class="statusline" id="rep-status"></div>
+    </div>
+    <div class="transcript-box">
+      <div class="tb-label"><span>あなたの発話（認識結果）</span><span id="rep-acc"></span></div>
+      <div class="tb-text hz-font" id="rep-trans"></div>
+    </div>
+    <div style="max-width:720px;margin:0 auto;display:flex;justify-content:space-between">
+      <button class="btn btn-ghost" onclick="repeatNav(-1)" ${curRepeatIdx===0?'disabled':''}>← 前の文</button>
+      <button class="btn btn-ghost" onclick="repeatNav(1)" ${curRepeatIdx===total-1?'disabled':''}>次の文 →</button>
+    </div>`;
+}
+function repeatNav(d){ const total=getLevel(curLevelId).sentences.length; curRepeatIdx=Math.max(0,Math.min(total-1,curRepeatIdx+d)); renderRepeatStage(); }
+function toggleRepeatRec(){
+  const btn=document.getElementById('rep-rec'), status=document.getElementById('rep-status');
+  if(recording){ stopRec(); return; }
+  btn.classList.add('recording'); btn.textContent='■ 停止';
+  status.classList.add('rec'); status.textContent='🔴 録音中… 中国語の文を声に出して読んでください';
+  startRec(
+    (live)=>{ document.getElementById('rep-trans').textContent=live; },
+    (final,sec)=>{ btn.classList.remove('recording'); btn.textContent='🎤 復唱する'; status.classList.remove('rec'); status.textContent=''; gradeRepeat(final,sec); });
+}
+function gradeRepeat(spoken,sec){
+  const s=getLevel(curLevelId).sentences[curRepeatIdx];
+  if(!spoken){ document.getElementById('rep-status').textContent='聞き取れませんでした。もう一度お試しください。'; return; }
+  const d=charDiff(s.hz, spoken);
+  // color original hanzi by matched flag (CJK chars only)
+  let ci=0;
+  const html=s.hz.split('').map(ch=>{ if(CJK.test(ch)){ const hit=d.matched[ci++]; return `<span class="char ${hit?'c-hit':'c-miss'}">${esc(ch)}</span>`; } return `<span class="char">${esc(ch)}</span>`; }).join('');
+  document.getElementById('rt-hz').innerHTML=html;
+  document.getElementById('rep-trans').textContent=spoken;
+  const col=d.accuracy>=85?'var(--green)':d.accuracy>=60?'var(--gold)':'var(--red2)';
+  document.getElementById('rep-acc').innerHTML=`<span style="color:${col};font-weight:700">${d.accuracy}% 一致</span>`;
+  if(sec>1){ setCpm(Math.round(d.total/(sec/60))); }
+  document.getElementById('rep-status').textContent = d.accuracy>=85?'🏆 とても良いです！ほぼ完璧':d.accuracy>=60?'👍 いい調子！赤い字をもう一度':'📈 ゆっくり聞いてもう一度挑戦しよう';
+}
+
+// ════════ INTERVIEW ════════
+function guideHtml(idx){
+  const g=GUIDES[Math.min(idx,GUIDES.length-1)];
+  return `<div class="guide"><div class="guide-head">🧭 話す型ガイド（${g.type}）— この流れで話せばOK</div>
+    ${g.steps.map((s,i)=>`<div class="gstep"><div class="gn">${i+1}</div><div><div class="gt">${s.t}</div><div class="gp">${s.p}</div></div></div>`).join('')}</div>`;
+}
+function renderInterview(){
+  if(!getTopics().find(t=>t.id===curTopicId)){ curTopicId='food'; curQ=0; }
+  document.getElementById('chead-title').textContent='会話練習';
+  document.getElementById('chead-sub').textContent='質問に中国語で答える練習。録音→自動分析で、使えた表現と改善点がわかります。';
+  document.getElementById('left-label').textContent='トピック選択';
+  renderLeftList(getTopics().map(t=>`<div class="card ${t.id===curTopicId?'active':''}" onclick="selectTopic('${t.id}')"><div class="c-title">${t.icon||'📝'} ${esc(t.title)}</div><div class="c-sub hz-font">${esc(t.sub||'')}</div></div>`).join(''));
+  renderInterviewStage();
+}
+function selectTopic(id){ curTopicId=id; curQ=0; renderInterview(); }
+function renderInterviewStage(){
+  const topic=getTopic(curTopicId); if(!topic){ setMode('interview'); return; }
+  const qa=topic.qa[curQ], total=topic.qa.length;
+  const intro = curQ===0 && topic.intro ? topic.intro : null;
+  const speakText = (intro?intro.hz+' ':'') + qa.q.hz;
+  document.getElementById('stage').innerHTML=`
+    <div class="qblock">
+      <div class="q-meta"><span>${topic.icon||'📝'} ${esc(topic.title)}</span><span style="color:var(--text2)">问题 ${curQ+1} / ${total}</span></div>
+      <div class="examiner">
+        ${intro?`<div class="e-ja" style="margin-bottom:8px">${esc(intro.ja||'')}</div>`:''}
+        <div class="e-hz">${esc(qa.q.hz)}</div>
+        ${qa.q.py?`<div class="e-py">${esc(qa.q.py)}</div>`:''}
+        ${qa.q.ja?`<div class="e-ja">${esc(qa.q.ja)}</div>`:''}
+        <div><button class="speak-q" onclick="speak(${aq(speakText)})">🔊 質問を聞く</button></div>
+      </div>
+    </div>
+    ${guideHtml(curQ)}
+    <div style="max-width:720px;margin:0 auto 14px;text-align:center">
+      <button class="btn btn-rec" id="iv-rec" onclick="toggleInterviewRec()">🎤 答えを録音する</button>
+      <span style="color:var(--text2);font-size:12px;margin-left:10px">目安：3〜5文（立場 → 理由/例 → まとめ）</span>
+      <div class="statusline" id="iv-status"></div>
+    </div>
+    <div class="transcript-box">
+      <div class="tb-label"><span>あなたの解答（録音後に編集もできます）</span></div>
+      <textarea id="iv-text" placeholder="🎤で録音するか、ここに中国語で直接入力できます"></textarea>
+    </div>
+    <div style="max-width:720px;margin:0 auto;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="analyzeAnswer()">📊 分析する</button>
+      <button class="btn btn-ghost" onclick="interviewNav(-1)" ${curQ===0?'disabled':''}>← 前の问题</button>
+      <button class="btn btn-ghost" onclick="interviewNav(1)" ${curQ===total-1?'disabled':''}>次の问题 →</button>
+    </div>
+    <div id="iv-feedback"></div>`;
+  renderModelAnswer(qa);
+}
+function interviewNav(d){ const total=getTopic(curTopicId).qa.length; curQ=Math.max(0,Math.min(total-1,curQ+d)); renderInterviewStage(); }
+function toggleInterviewRec(){
+  const btn=document.getElementById('iv-rec'), status=document.getElementById('iv-status');
+  if(recording){ stopRec(); return; }
+  btn.classList.add('recording'); btn.textContent='■ 録音停止';
+  status.classList.add('rec'); status.textContent='🔴 録音中… 質問に中国語で答えてください';
+  startRec(
+    (live)=>{ document.getElementById('iv-text').value=live; },
+    (final,sec)=>{ btn.classList.remove('recording'); btn.textContent='🎤 答えを録音する'; status.classList.remove('rec');
+      status.textContent=final?'✅ 録音完了。内容を確認して「分析する」を押してください':'聞き取れませんでした'; window._lastRecSec=sec; });
+}
+function analyzeAnswer(){
+  const text=(document.getElementById('iv-text').value||'').trim();
+  if(!text){ toast('まず録音するか、解答を入力してください'); return; }
+  const topic=getTopic(curTopicId), qa=topic.qa[curQ];
+  const chars=cjkChars(text), cc=chars.length;
+  const sentences=text.split(/[。！？!?]+/).map(x=>x.trim()).filter(x=>cjkChars(x).length>=2);
+  const sc=sentences.length;
+  const uniq=new Set(chars).size, diversity=cc?Math.round(uniq/cc*100):0;
+  const sec=window._lastRecSec||0, cpm=sec>2?Math.round(cc/(sec/60)):null;
+  if(cpm) setCpm(cpm);
+  // connector detection
+  const DET=[
+    {label:'我觉得/我认为', re:/我觉得|我认为|在我看来|对我来说/},
+    {label:'因为…所以…', re:/因为|所以/},
+    {label:'而且/不但…而且', re:/而且|不但|并且/},
+    {label:'比如/例如', re:/比如|例如/},
+    {label:'虽然…但是…', re:/虽然|但是|不过/},
+    {label:'随着…', re:/随着/},
+    {label:'总的来说/总之', re:/总的来说|总之|总而言之/},
+    {label:'更喜欢/我更…', re:/更喜欢|更/}
+  ];
+  const used=DET.filter(p=>p.re.test(text)), missing=DET.filter(p=>!p.re.test(text)).slice(0,4);
+  const hasStance=/我觉得|我认为|在我看来|对我来说|我更喜欢|我喜欢/.test(text);
+  const hasReason=/因为|所以|这样可以|因此/.test(text);
+  const hasExample=/比如|例如|有一次|上次/.test(text);
+  const hasConclusion=/总的来说|总之|所以.*我|我相信/.test(text);
+  const sFluency=clampScore((cpm?band(cpm,60,260,120,200):3)+(sc>=3?0.5:0));
+  const sVocab=clampScore(band(diversity,30,80,45,70)+(cc>=40?0.5:0));
+  const sStruct=clampScore(2+(hasStance?1:0)+(hasReason?1:0)+(hasConclusion?1:0)+(used.length>=3?1:0)-(used.length<1?1:0));
+  const sDevelop=clampScore(band(cc,15,90,40,80)+(hasExample?0.5:0));
+  const overall=Math.round((sFluency+sVocab+sStruct+sDevelop)/4*10)/10;
+  const tag=overall>=4?'🏆 优秀':overall>=3?'👍 良好':'📈 加油';
+  const usedChips=used.length?used.map(u=>`<span class="chip chip-green">✓ ${esc(u.label)}</span>`).join(''):'<span class="chip chip-gray">まだ使えていません</span>';
+  const missChips=missing.map(p=>`<span class="chip chip-gold">＋ ${esc(p.label)}</span>`).join('');
+  const ck=(b)=>`<span class="ck ${b?'ok':'no'}">${b?'✓':'–'}</span>`;
+  const html=`<div class="fb-card">
+    <div class="fb-head"><div><div style="font-size:11px;color:var(--text2);margin-bottom:4px">目安スコア</div><div class="score">${overall}<sub>/5</sub></div></div>
+    <div style="text-align:right"><div style="margin-bottom:4px">${tag}</div><div style="font-size:11px;color:var(--text1)">ルールベース自動分析</div></div></div>
+    <div class="metrics">
+      <div class="metric"><div class="mv" style="color:var(--gold)">${cpm??'—'}</div><div class="ml">字/分</div></div>
+      <div class="metric"><div class="mv" style="color:var(--blue)">${cc}</div><div class="ml">字数</div></div>
+      <div class="metric"><div class="mv" style="color:var(--green)">${diversity}%</div><div class="ml">字の多様性</div></div>
+      <div class="metric"><div class="mv" style="color:var(--text1)">${sc}</div><div class="ml">文の数</div></div>
+    </div>
+    <div class="fb-body">
+      <div class="fb-sec"><h5>✅ 使えた表現</h5>${usedChips}</div>
+      <div class="fb-sec"><h5>🎯 次に使いたい表現</h5>${missChips||'<span class="chip chip-gray">十分使えています！</span>'}</div>
+      <div class="fb-sec"><h5>🧱 構成チェック</h5>
+        <div class="check-row">${ck(hasStance)} 立場をはっきり示している（我觉得／我更喜欢…）</div>
+        <div class="check-row">${ck(hasReason)} 理由を述べている（因为／所以…）</div>
+        <div class="check-row">${ck(hasExample)} 具体例を入れている（比如／有一次…）</div>
+        <div class="check-row">${ck(hasConclusion)} まとめがある（总的来说／所以我…）</div>
+      </div>
+      ${qa.a?`<div class="fb-sec"><h5>⭐ モデル解答</h5><div class="model-box"><div class="m-hz" id="fbm">${esc(qa.a.hz)}</div>${qa.a.ja?`<div class="m-ja">${esc(qa.a.ja)}</div>`:''}</div>
+        <div style="display:flex;gap:6px;margin-top:10px"><button class="btn btn-blue" onclick="speak(${aq(qa.a.hz)})">🔊 聞く</button><button class="btn btn-ghost" onclick="saveSentenceVocab(${aq(qa.a.hz)},'',${aq(qa.a.ja||'')})">＋ この解答を保存</button></div></div>`:'<div class="note">カスタムトピックのためモデル解答はありません。⚙でAIキーを設定すると生成できます。</div>'}
+      ${apiKey?`<button class="btn btn-blue" onclick="aiReview()">✨ ClaudeでさらにAI添削</button><div id="ai-review"></div>`:`<div class="note">💡 さらに細かい添削が欲しい場合は、右上⚙からAPIキー（任意）を設定するとClaude添削が解放されます。</div>`}
+    </div></div>`;
+  document.getElementById('iv-feedback').innerHTML=html;
+  document.getElementById('iv-feedback').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function band(v,min,max,lo,hi){ if(v>=lo&&v<=hi) return 5; if(v<lo) return Math.max(0,5-(lo-v)/(lo-min)*3); return Math.max(0,5-(v-hi)/(max-hi)*3); }
+function clampScore(x){ return Math.max(1,Math.min(5,Math.round(x))); }
+function renderModelAnswer(qa){
+  document.getElementById('right-label').textContent='モデル解答';
+  const box=document.getElementById('model-answer');
+  if(!qa.a){ box.innerHTML='<div class="vempty">カスタムトピックのためモデル解答はありません。<br>⚙でAPIキーを入れるとAIが生成できます。</div>'; renderPhraseListPanel(); return; }
+  box.innerHTML=`<div class="q-meta" style="margin-bottom:8px">この问题のモデル解答</div>
+    <div class="m-hz hz-font">${esc(qa.a.hz)}</div>${qa.a.ja?`<div class="m-ja">${esc(qa.a.ja)}</div>`:''}
+    <div style="display:flex;gap:6px;margin-top:12px"><button class="btn btn-blue" onclick="speak(${aq(qa.a.hz)})">🔊 聞く</button><button class="btn btn-ghost" onclick="saveSentenceVocab(${aq(qa.a.hz)},'',${aq(qa.a.ja||'')})">＋ 保存</button></div>`;
+  renderPhraseListPanel();
+}
+
+// ════════ CUSTOM THEME ════════
+function renderCustom(){
+  document.getElementById('chead-title').textContent='自由テーマ';
+  document.getElementById('chead-sub').textContent='気になる話題を入力すると、中国語の質問を作って練習できます。';
+  document.getElementById('left-label').textContent='最近のテーマ';
+  const recents=uget('zh_recent_themes');
+  renderLeftList(recents.length?recents.map(t=>`<div class="card" onclick="loadCustomTheme(${aq(t)})"><div class="c-title">🎬 ${esc(String(t).slice(0,24))}</div></div>`).join(''):'<div class="vempty">まだありません。<br>右で話題を入力してください。</div>');
+  document.getElementById('right-label').textContent='使える表現';
+  renderPhraseListPanel();
+  document.getElementById('model-answer').innerHTML='<div class="vempty">テーマを入力して質問を作ると、ここに表現が表示されます。</div>';
+  document.getElementById('stage').innerHTML=`<div class="custom-wrap">
+    <h3 style="font-family:'Syne';font-size:16px;color:var(--red2);margin-bottom:4px">話したいテーマを入力</h3>
+    <div class="eg">日本語でも中国語でもOK。例：环保（環境保護）／网络购物（ネット通販）／AIと仕事 …</div>
+    <label>テーマ（短く）</label>
+    <input id="ct-topic" placeholder="例：环保 / 在家工作 / 旅行的好处 …" />
+    <label>補足メモ（任意：要点など。AI生成時に活用されます）</label>
+    <textarea id="ct-notes" placeholder="例：动画里说网购方便，但是也有缺点…"></textarea>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-gold" onclick="makeCustom(false)">📝 質問を作る（キー不要）</button>
+      ${apiKey?`<button class="btn btn-blue" onclick="makeCustom(true)">✨ AIで話題に合わせて作る＋モデル解答</button>`:''}
+    </div>
+    <div class="eg" style="margin-top:8px">「キー不要」はテンプレ式で3問を即生成。AI生成は話題に合った自然な質問・モデル解答・ピンインを作ります（⚙でキー設定時のみ）。</div>
+    <div id="ct-status" class="statusline"></div>
+  </div>`;
+}
+function loadCustomTheme(t){ setMode('custom'); setTimeout(()=>{ const i=document.getElementById('ct-topic'); if(i) i.value=t; },30); }
+function saveRecentTheme(t){ let r=uget('zh_recent_themes'); r=[t,...r.filter(x=>x!==t)].slice(0,8); localStorage.setItem('zh_recent_themes',JSON.stringify(r)); }
+function templateQuestions(T){
+  return [
+    {q:{hz:`你能描述一次跟“${T}”有关的经历吗？`, py:'', ja:`「${T}」に関する経験を説明できますか？`}},
+    {q:{hz:`关于“${T}”，你更喜欢传统的方式，还是新的方式？为什么？`, py:'', ja:`「${T}」について、伝統的なやり方と新しいやり方、どちらが好き？なぜ？`}},
+    {q:{hz:`你觉得以后“${T}”会越来越普遍吗？为什么？`, py:'', ja:`今後「${T}」はますます一般的になると思いますか？なぜ？`}}
+  ];
+}
+async function makeCustom(useAI){
+  const topic=(document.getElementById('ct-topic').value||'').trim();
+  const notes=(document.getElementById('ct-notes').value||'').trim();
+  if(!topic){ toast('テーマを入力してください'); return; }
+  const status=document.getElementById('ct-status'); saveRecentTheme(topic);
+  if(useAI && apiKey){
+    status.textContent='Claudeが質問とモデル解答を生成中…';
+    try{
+      const prompt=`你是中文口语考官。话题："${topic}"。${notes?('参考笔记：'+notes):''}\n请出3个中文口语问题，顺序为：(1)描述个人经历 (2)二选一的偏好 (3)对未来的预测。每个问题再写一个80-110字、自然口语化的高分示范回答，多用"我觉得""因为…所以…""比如""总的来说"等。\n只返回合法JSON：{"qa":[{"q":{"hz":"","py":"","ja":""},"a":{"hz":"","ja":""}}, ...]}（py是拼音，ja是日语翻译）`;
+      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1800,messages:[{role:'user',content:prompt}]})});
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||('HTTP '+res.status)); }
+      const d=await res.json(); const raw=d.content.map(c=>c.text||'').join('');
+      const parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+      startCustomSession(topic, parsed.qa);
+    }catch(e){ status.textContent='AI生成エラー: '+e.message+'（テンプレ式で作成します）'; startCustomSession(topic, templateQuestions(topic)); }
+  } else { startCustomSession(topic, templateQuestions(topic)); }
+}
+function startCustomSession(topic, qa){
+  customTopic={ id:'__custom__', icon:'🎬', title:String(topic).slice(0,20), sub:'自由テーマ', intro:{hz:`今天我们来聊聊“${topic}”。`,py:'',ja:`今日は「${topic}」について話しましょう。`}, qa };
+  curTopicId='__custom__'; curQ=0; mode='interview';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.mode==='interview'));
+  document.getElementById('chead-title').textContent='会話練習（自由テーマ）';
+  document.getElementById('chead-sub').textContent='あなたのテーマで練習。録音→自動分析。型ガイドを見ながら話しましょう。';
+  document.getElementById('left-label').textContent='トピック';
+  renderLeftList(`<div class="card active"><div class="c-title">🎬 ${esc(customTopic.title)}</div><div class="c-sub">あなたのテーマ</div></div>
+    <div class="card" onclick="setMode('custom')"><div class="c-title">＋ 別のテーマを作る</div></div>
+    <div class="card" onclick="selectTopic('food')"><div class="c-title">📚 用意された問題に戻る</div></div>`);
+  document.getElementById('wpm-sec').classList.remove('hide');
+  renderInterviewStage();
+}
+
+// ════════ PHRASES MODE ════════
+function renderPhrasesMode(){
+  document.getElementById('chead-title').textContent='フレーズ＆語彙';
+  document.getElementById('chead-sub').textContent='ネイティブが多用する「型」を覚えて、会話練習で実際に使ってみましょう。';
+  document.getElementById('left-label').textContent='練習のヒント';
+  renderLeftList(`<div class="card" onclick="setMode('interview')"><div class="c-title">🎤 会話で試す</div><div class="c-sub">覚えた表現を使うと自動で検出されます</div></div>
+    <div class="card" onclick="setMode('repeat')"><div class="c-title">🔁 跟读で口に馴染ませる</div><div class="c-sub">声に出して反復</div></div>
+    <div class="card" onclick="setMode('add')"><div class="c-title">➕ 自分の表現を追加</div></div>`);
+  document.getElementById('right-label').textContent='保存した表現';
+  document.getElementById('model-answer').innerHTML=vocab.length?vocab.slice(0,12).map(v=>`<div class="card" style="margin-bottom:6px"><div class="hz-font" style="color:var(--gold);font-weight:600">${esc(v.hz)}</div><div style="font-size:11px;color:var(--text1)">${esc(v.ja||'')}</div></div>`).join(''):'<div class="vempty">＋ で表現を保存しましょう</div>';
+  renderPhraseListPanel();
+  document.getElementById('stage').innerHTML=`<div style="max-width:760px;margin:0 auto">
+    <h3 style="font-family:'Syne';font-size:16px;margin-bottom:6px;color:var(--red2)">ネイティブがよく使う表現集</h3>
+    <div class="note" style="margin-bottom:16px">🔊で読み上げ、＋で単語帳に保存。①〜⑥の順に並べれば、それだけで筋の通った解答になります。会話練習で実際に使うと自動で✓が付きます。</div>
+    ${getPhraseBank().map(c=>`<div class="cat"><h4>${esc(c.cat)}<span class="badge">${c.items.length}</span></h4>
+      ${c.items.map(p=>`<div class="pcard"><div><div class="pe">${esc(p.hz)}</div><div class="ppy">${esc(p.py||'')}</div><div class="pj">${esc(p.ja||'')}</div></div>
+        <div class="pacts"><button class="pmini" onclick="speak(${aq(p.hz.replace(/…/g,''))})">🔊</button><button class="pmini" onclick="savePhraseVocab(${aq(p.hz)},${aq(p.py||'')},${aq(p.ja||'')})">＋</button></div></div>`).join('')}
+    </div>`).join('')}
+  </div>`;
+}
+function renderPhraseListPanel(){
+  const el=document.getElementById('phrase-list'); if(!el) return;
+  el.innerHTML=flatPhrases().slice(0,12).map(p=>`<div class="phrase-item"><div class="ph-hz">${esc(p.hz)}</div><div class="ph-py">${esc(p.py||'')}</div><div class="ph-ja">${esc(p.ja||'')}</div></div>`).join('')
+    +`<div class="phrase-item" style="text-align:center"><a onclick="setMode('phrases')" style="color:var(--red2);cursor:pointer">全表現を見る →</a></div>`;
+}
+
+// ════════ ADD MODE ════════
+function renderAddMode(){
+  document.getElementById('chead-title').textContent='➕ コンテンツを追加';
+  document.getElementById('chead-sub').textContent='自分だけの復唱文・会話トピック・表現を追加できます（ブラウザに保存）。';
+  document.getElementById('left-label').textContent='ヒント';
+  renderLeftList(`<div class="card" onclick="setMode('repeat')"><div class="c-title">🔁 跟读で使う</div></div>
+    <div class="card" onclick="setMode('interview')"><div class="c-title">🎤 会話で使う</div></div>
+    <div class="card" onclick="setMode('phrases')"><div class="c-title">💬 表現一覧</div></div>`);
+  document.getElementById('right-label').textContent='追加のコツ';
+  document.getElementById('model-answer').innerHTML=`<div class="note" style="padding:4px">・漢字（中国語）だけ入れればOK。ピンイン・日本語訳は任意です。<br>・⚙でAPIキーを設定すると「AIで補完」で自動入力できます。<br>・追加した内容はこの端末のブラウザに保存され、各モードにすぐ反映されます。</div>`;
+  renderPhraseListPanel();
+  const uRepeat=(()=>{ try{ return JSON.parse(localStorage.getItem('zh_userRepeat')||'{}'); }catch(_){ return {}; } })();
+  const uTopics=uget('zh_userTopics'), uPhrases=uget('zh_userPhrases');
+  const repeatCount=Object.values(uRepeat).reduce((a,b)=>a+(b?b.length:0),0);
+  document.getElementById('stage').innerHTML=`<div class="form-wrap">
+    <div class="form-card">
+      <h3>🔁 復唱文を追加</h3><div class="sub">跟读モードに追加されます（レベル別）</div>
+      <div class="field"><label>レベル</label><select id="ar-level">${REPEAT_LEVELS.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join('')}</select></div>
+      <div class="field"><label>中国語（汉字）※必須</label><input id="ar-hz" placeholder="例：我每天都很忙。" /></div>
+      <div class="field"><label>ピンイン（任意）</label><input id="ar-py" placeholder="例：Wǒ měi tiān dōu hěn máng." /></div>
+      <div class="field"><label>日本語訳（任意）</label><input id="ar-ja" placeholder="例：私は毎日とても忙しい。" /></div>
+      <div class="form-actions">${apiKey?`<button class="btn btn-blue" onclick="aiFill('ar')">✨ AIで補完</button>`:''}<button class="btn btn-gold" onclick="addRepeat()">追加する</button></div>
+      <div style="margin-top:12px">${Object.keys(uRepeat).flatMap(lv=>(uRepeat[lv]||[]).map(s=>`<div class="user-item"><div class="ui-hz">${esc(s.hz)}</div><div class="ui-meta">${esc(lv)} ・ ${esc(s.py||'')}</div><button class="ui-del" onclick="delRepeat('${lv}',${s.id})">×</button></div>`)).join('')||'<div class="eg">まだ追加した文はありません。</div>'}</div>
+    </div>
+    <div class="form-card">
+      <h3>🎤 会話の質問を追加</h3><div class="sub">同じトピック名なら質問が追加され、新しい名前なら新トピックになります</div>
+      <div class="field"><label>トピック名 ※必須</label><input id="at-title" placeholder="例：环保 / 健康 / 我的爱好" /></div>
+      <div class="field"><label>質問（中国語）※必須</label><input id="at-q" placeholder="例：你平时怎么保护环境？" /></div>
+      <div class="field"><label>質問の日本語訳（任意）</label><input id="at-qja" placeholder="例：普段どうやって環境を守っていますか？" /></div>
+      <div class="field"><label>モデル解答（中国語・任意）</label><textarea id="at-a" placeholder="例：我平时会自己带购物袋，也会节约用水…"></textarea></div>
+      <div class="field"><label>モデル解答の日本語訳（任意）</label><textarea id="at-aja"></textarea></div>
+      <div class="form-actions">${apiKey?`<button class="btn btn-blue" onclick="aiFillTopic()">✨ AIで補完</button>`:''}<button class="btn btn-gold" onclick="addTopicQ()">追加する</button></div>
+      <div style="margin-top:12px">${uTopics.map(t=>`<div class="user-item"><div class="ui-hz">${t.icon||'📝'} ${esc(t.title)}</div><div class="ui-meta">${t.qa.length}問</div><button class="ui-del" onclick="delTopic('${t.id}')">×</button></div>`).join('')||'<div class="eg">まだ追加したトピックはありません。</div>'}</div>
+    </div>
+    <div class="form-card">
+      <h3>💬 表現を追加</h3><div class="sub">フレーズ集と右パネルに「⭐自分で追加」として表示されます</div>
+      <div class="field"><label>中国語 ※必須</label><input id="ap-hz" placeholder="例：说实话，…" /></div>
+      <div class="field"><label>ピンイン（任意）</label><input id="ap-py" placeholder="例：shuō shíhuà,…" /></div>
+      <div class="field"><label>日本語（任意）</label><input id="ap-ja" placeholder="例：正直に言うと…" /></div>
+      <div class="form-actions">${apiKey?`<button class="btn btn-blue" onclick="aiFill('ap')">✨ AIで補完</button>`:''}<button class="btn btn-gold" onclick="addPhrase()">追加する</button></div>
+      <div style="margin-top:12px">${uPhrases.map(p=>`<div class="user-item"><div class="ui-hz">${esc(p.hz)}</div><div class="ui-meta">${esc(p.py||'')} ・ ${esc(p.ja||'')}</div><button class="ui-del" onclick="delPhrase(${p.id})">×</button></div>`).join('')||'<div class="eg">まだ追加した表現はありません。</div>'}</div>
+    </div>
+    <div class="eg">登録数：復唱文 ${repeatCount} ・ トピック ${uTopics.length} ・ 表現 ${uPhrases.length}</div>
+  </div>`;
+}
+function addRepeat(){
+  const lv=document.getElementById('ar-level').value, hz=document.getElementById('ar-hz').value.trim();
+  if(!hz){ toast('中国語（汉字）を入力してください'); return; }
+  const py=document.getElementById('ar-py').value.trim(), ja=document.getElementById('ar-ja').value.trim();
+  const u=(()=>{ try{ return JSON.parse(localStorage.getItem('zh_userRepeat')||'{}'); }catch(_){ return {}; } })();
+  if(!u[lv]) u[lv]=[]; u[lv].push({hz,py,ja,id:Date.now(),editable:true});
+  localStorage.setItem('zh_userRepeat',JSON.stringify(u)); toast('復唱文を追加しました ⭐'); renderAddMode();
+}
+function delRepeat(lv,id){ const u=JSON.parse(localStorage.getItem('zh_userRepeat')||'{}'); if(u[lv]) u[lv]=u[lv].filter(s=>s.id!==id); localStorage.setItem('zh_userRepeat',JSON.stringify(u)); renderAddMode(); }
+function addTopicQ(){
+  const title=document.getElementById('at-title').value.trim(), qhz=document.getElementById('at-q').value.trim();
+  if(!title||!qhz){ toast('トピック名と質問は必須です'); return; }
+  const qja=document.getElementById('at-qja').value.trim(), ahz=document.getElementById('at-a').value.trim(), aja=document.getElementById('at-aja').value.trim();
+  const list=uget('zh_userTopics');
+  let t=list.find(x=>x.title===title);
+  const qa={ q:{hz:qhz,py:'',ja:qja}, a: ahz?{hz:ahz,ja:aja}:undefined };
+  if(t){ t.qa.push(qa); }
+  else { list.push({ id:'u'+Date.now(), icon:'⭐', title, sub:'自分で追加', intro:{hz:`今天我们来聊聊“${title}”。`,py:'',ja:''}, qa:[qa], editable:true }); }
+  localStorage.setItem('zh_userTopics',JSON.stringify(list)); toast('質問を追加しました ⭐'); renderAddMode();
+}
+function delTopic(id){ localStorage.setItem('zh_userTopics',JSON.stringify(uget('zh_userTopics').filter(t=>t.id!==id))); renderAddMode(); }
+function addPhrase(){
+  const hz=document.getElementById('ap-hz').value.trim();
+  if(!hz){ toast('中国語を入力してください'); return; }
+  const py=document.getElementById('ap-py').value.trim(), ja=document.getElementById('ap-ja').value.trim();
+  const list=uget('zh_userPhrases'); list.push({hz,py,ja,id:Date.now(),editable:true});
+  localStorage.setItem('zh_userPhrases',JSON.stringify(list)); toast('表現を追加しました ⭐'); renderAddMode();
+}
+function delPhrase(id){ localStorage.setItem('zh_userPhrases',JSON.stringify(uget('zh_userPhrases').filter(p=>p.id!==id))); renderAddMode(); }
+
+// AI fill (optional): fill pinyin + ja from hanzi
+async function aiFill(prefix){
+  const hz=document.getElementById(prefix+'-hz').value.trim();
+  if(!hz){ toast('先に中国語を入力してください'); return; }
+  if(!apiKey){ toast('⚙でAPIキーを設定してください'); return; }
+  toast('AIで補完中…');
+  try{
+    const out=await aiPyJa(hz);
+    if(out.py) document.getElementById(prefix+'-py').value=out.py;
+    if(out.ja) document.getElementById(prefix+'-ja').value=out.ja;
+    toast('補完しました');
+  }catch(e){ toast('補完エラー: '+e.message); }
+}
+async function aiFillTopic(){
+  const ahz=document.getElementById('at-a').value.trim(), qhz=document.getElementById('at-q').value.trim();
+  if(!apiKey){ toast('⚙でAPIキーを設定してください'); return; }
+  toast('AIで補完中…');
+  try{
+    if(qhz && !document.getElementById('at-qja').value.trim()){ const o=await aiPyJa(qhz); if(o.ja) document.getElementById('at-qja').value=o.ja; }
+    if(ahz && !document.getElementById('at-aja').value.trim()){ const o=await aiPyJa(ahz); if(o.ja) document.getElementById('at-aja').value=o.ja; }
+    toast('補完しました');
+  }catch(e){ toast('補完エラー: '+e.message); }
+}
+async function aiPyJa(hz){
+  const prompt=`给出下面中文的拼音（带声调）和日语翻译。只返回JSON：{"py":"","ja":""}\n中文："${hz}"`;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,messages:[{role:'user',content:prompt}]})});
+  if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||('HTTP '+res.status)); }
+  const d=await res.json(); const raw=d.content.map(c=>c.text||'').join('');
+  return JSON.parse(raw.replace(/```json|```/g,'').trim());
+}
+
+// ════════ AI REVIEW (optional) ════════
+async function aiReview(){
+  const text=(document.getElementById('iv-text').value||'').trim();
+  const qa=getTopic(curTopicId).qa[curQ];
+  const box=document.getElementById('ai-review'); box.innerHTML='<div class="note">Claudeが添削中…</div>';
+  const prompt=`你是中文口语老师。请用日语点评下面的回答。\n问题："${qa.q.hz}"\n${qa.a?('示范回答："'+qa.a.hz+'"'):''}\n学生回答："${text}"\n请简洁地用日语写：①好的地方2点 ②需要改正的语法/用词（错误→修正） ③更地道的说法2个（附拼音）。`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:900,messages:[{role:'user',content:prompt}]})});
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||('HTTP '+res.status)); }
+    const d=await res.json(); const txt=d.content.map(c=>c.text||'').join('');
+    box.innerHTML=`<div class="model-box" style="background:var(--blue-bg);border-color:rgba(91,155,212,0.25);margin-top:10px"><div style="font-size:13px;line-height:1.8">${esc(txt).replace(/\n/g,'<br>')}</div></div>`;
+  }catch(e){ box.innerHTML=`<div class="note" style="color:var(--red2)">AI添削エラー: ${esc(e.message)}</div>`; }
+}
+
+// ════════ VOCAB ════════
+function savePhraseVocab(hz,py,ja){ addVocabZh(hz,py,ja); }
+function saveSentenceVocab(hz,py,ja){ addVocabZh(hz,py,ja); }
+function addVocabZh(hz,py,ja){
+  if(!hz) return;
+  if(vocab.find(v=>v.hz===hz)){ toast('保存済みです'); return; }
+  vocab.unshift({hz,py:py||'',ja:ja||'',date:new Date().toLocaleDateString('ja-JP'),id:Date.now()});
+  saveVocab(); renderVocab(); toast('単語帳に保存しました ⭐');
+}
+function removeVocab(id){ vocab=vocab.filter(v=>v.id!==id); saveVocab(); renderVocab(); }
+function saveVocab(){ localStorage.setItem('zh_vocab',JSON.stringify(vocab)); }
+function renderVocab(){
+  document.getElementById('vcount').textContent=vocab.length;
+  document.getElementById('top-vocab').textContent=vocab.length;
+  const list=document.getElementById('vlist');
+  if(!vocab.length){ list.innerHTML='<div class="vempty" id="vempty">フレーズや文を保存しましょう</div>'; return; }
+  list.innerHTML=vocab.map(v=>`<div class="ventry"><div class="vw">${esc(v.hz)}</div>${v.py?`<div class="vp">${esc(v.py)}</div>`:''}${v.ja?`<div class="vj">${esc(v.ja)}</div>`:''}<button class="vd" onclick="removeVocab(${v.id})">×</button></div>`).join('');
+}
+function toggleVocab(){ const b=document.getElementById('vbody'),a=document.getElementById('varrow'); const hidden=b.classList.toggle('hide'); a.textContent=hidden?'▼':'▲'; }
+
+// ════════ MISC ════════
+function setCpm(n){ document.getElementById('wpm-num').textContent=n; }
+function toast(msg){ const e=document.createElement('div'); e.className='toast'; e.textContent=msg; document.body.appendChild(e); setTimeout(()=>e.remove(),2300); }
+function openSettings(){ document.getElementById('key-input').value=apiKey; document.getElementById('settings-modal').classList.add('show'); }
+function closeSettings(){ document.getElementById('settings-modal').classList.remove('show'); }
+function saveKey(){ apiKey=document.getElementById('key-input').value.trim(); localStorage.setItem('zh_key',apiKey); closeSettings(); toast(apiKey?'AI補完が有効になりました':'キーを削除しました'); setMode(mode); }
+
+// init
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged=()=>{}; }
+document.addEventListener('click', e=>{ const c=e.target.closest('.gstep .gp code'); if(c) speak(c.textContent.replace(/…/g,'').replace(/（[^）]*）/g,'').trim()); });
+renderVocab(); renderPhraseListPanel(); setMode('repeat');
+</script>
+</body>
+</html>
