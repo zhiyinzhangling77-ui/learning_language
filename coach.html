@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国語コーチ — 30日プログラム</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#0a0a0c;--bg1:#13131a;--bg2:#1c1c26;--bg3:#262633;--bg4:#333344;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.13);
+  --text0:#f1f1f7;--text1:#a8a8b8;--text2:#5f5f70;
+  --red:#e25c5c;--red2:#f0837a;--red-bg:rgba(226,92,92,.13);
+  --gold:#e0b34a;--gold2:#f5cf76;--gold-bg:rgba(224,179,74,.12);
+  --teal:#34c5a8;--teal2:#5fe3c6;--teal-bg:rgba(52,197,168,.13);
+  --indigo:#7c8cf5;--indigo-bg:rgba(124,140,245,.12);
+  --r:10px;--r2:14px;
+}
+body{background:var(--bg0);color:var(--text0);font-family:'Inter','Noto Sans SC',sans-serif;font-size:14px;height:100vh;overflow:hidden}
+button{font-family:inherit}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:99px}
+.hz{font-family:'Noto Sans SC'}
+.app{display:grid;grid-template-rows:54px 56px 1fr;height:100vh}
+
+.topbar{background:var(--bg1);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:16px}
+.logo{font-family:'Syne';font-weight:800;font-size:16px;color:var(--red2);letter-spacing:-.02em;white-space:nowrap}
+.logo em{color:var(--text1);font-style:normal;font-weight:400;font-size:11px;margin-left:8px}
+.tools{flex:1;display:flex;justify-content:center;gap:6px;align-items:center}
+.tselect{background:var(--bg2);border:1px solid var(--line2);color:var(--text0);font-family:inherit;font-size:13px;padding:7px 11px;border-radius:7px;outline:none;min-width:200px}
+.tselect:focus{border-color:var(--red2)}
+.langlinks{display:flex;gap:10px}
+.langlink{font-size:11px;color:var(--text2);text-decoration:none;white-space:nowrap}
+.langlink:hover{color:var(--text1)}
+.gear{background:var(--bg2);border:1px solid var(--line2);color:var(--text1);width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:15px}
+.gear:hover{border-color:var(--red2);color:var(--red2)}
+.gear.warn{border-color:var(--gold);color:var(--gold)}
+
+.steps{background:var(--bg1);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 14px;gap:6px;overflow-x:auto}
+.step{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;cursor:pointer;font-size:12.5px;color:var(--text2);border:1px solid transparent;white-space:nowrap;transition:all .15s}
+.step:hover{color:var(--text1)}
+.step.active{background:var(--red-bg);color:var(--red2);border-color:rgba(226,92,92,.3)}
+.step .n{background:var(--bg3);border:1px solid var(--line2);color:var(--text1);width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Syne'}
+.step.active .n{background:var(--red);color:#fff;border-color:var(--red)}
+.step.done .n{background:var(--teal-bg);color:var(--teal2);border-color:rgba(52,197,168,.4)}
+
+.stage{overflow-y:auto;padding:24px}
+.wrap{max-width:760px;margin:0 auto}
+
+.card{background:var(--bg1);border:1px solid var(--line);border-radius:var(--r2);padding:20px;margin-bottom:16px}
+.card h3{font-family:'Syne';font-size:15px;color:var(--red2);margin-bottom:5px}
+.card .sub{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6}
+.card .sub code{background:var(--bg3);border-radius:4px;padding:1px 6px;color:var(--gold2);font-family:'Noto Sans SC';font-size:12px}
+
+.btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:var(--red2)}
+.btn-gold{background:var(--gold);color:#1a1100}.btn-gold:hover{background:var(--gold2)}
+.btn-teal{background:var(--teal);color:#04211b}.btn-teal:hover{background:var(--teal2)}
+.btn-indigo{background:var(--indigo-bg);color:var(--indigo);border:1px solid rgba(124,140,245,.3)}.btn-indigo:hover{background:rgba(124,140,245,.22)}
+.btn-ghost{background:var(--bg3);color:var(--text1);border:1px solid var(--line2)}.btn-ghost:hover{border-color:var(--red2);color:var(--red2)}
+.btn-rec{background:var(--bg3);color:var(--text1);border:1px solid var(--line2)}
+.btn-rec.recording{background:var(--red-bg);color:var(--red2);border-color:var(--red2);animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(226,92,92,.4)}50%{box-shadow:0 0 0 8px rgba(226,92,92,0)}}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:6px 11px;font-size:12px}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* chat */
+.chat{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;max-height:480px;overflow-y:auto;margin-bottom:12px}
+.msg{margin-bottom:12px;display:flex;gap:10px}
+.msg .av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;font-family:'Syne'}
+.msg.ai .av{background:var(--red-bg);color:var(--red2);border:1px solid rgba(226,92,92,.3)}
+.msg.user .av{background:var(--bg3);color:var(--text1);border:1px solid var(--line2)}
+.msg .bub{flex:1;font-size:14px;line-height:1.7;padding-top:4px}
+.msg.user{flex-direction:row-reverse}.msg.user .bub{text-align:right}
+.msg .bub.zh{font-family:'Noto Sans SC';font-size:15px}
+.input-row{display:flex;gap:8px}
+.input-row textarea{flex:1;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;color:var(--text0);font-family:'Inter','Noto Sans SC';font-size:14px;padding:10px 12px;resize:none;height:42px;outline:none;line-height:1.5}
+.input-row textarea:focus{border-color:var(--red2)}
+
+/* summary */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.sum-grid{grid-template-columns:1fr}}
+.sum-box{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:13px}
+.sum-box h5{font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.04em}
+.sum-box ul{list-style:none;font-size:13px;line-height:1.8}
+.sum-box li::before{content:'•';color:var(--text2);margin-right:6px}
+
+/* vocab table */
+.vt{width:100%;border-collapse:collapse;font-size:13px;background:var(--bg2);border-radius:9px;overflow:hidden}
+.vt th{background:var(--bg3);padding:9px 10px;text-align:left;font-weight:600;font-size:11px;letter-spacing:.05em;color:var(--text1);border-bottom:1px solid var(--line)}
+.vt td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.vt .zh{font-family:'Noto Sans SC';font-weight:600;color:var(--gold)}
+.vt .py{font-size:11px;color:var(--text2);font-family:'Noto Sans SC'}
+.vt .ex{font-family:'Noto Sans SC';color:var(--text1);font-size:12px}
+.vt .hsk{display:inline-block;background:var(--indigo-bg);color:var(--indigo);border-radius:99px;font-size:10px;font-weight:700;padding:1px 7px}
+
+/* day tabs */
+.day-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.day-tab{padding:7px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--line);color:var(--text1);font-size:12px;cursor:pointer}
+.day-tab.active{background:var(--red-bg);color:var(--red2);border-color:rgba(226,92,92,.3)}
+.day-tab .dn{font-family:'Syne';font-weight:700;margin-right:5px}
+
+.passage{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--red2);border-radius:5px 11px 11px 5px;padding:16px 18px;line-height:2;font-family:'Noto Sans SC';font-size:16px;letter-spacing:.02em}
+.pinyin-line{display:block;font-family:'Noto Sans SC';font-size:11px;color:var(--gold);line-height:1.4;margin-bottom:6px}
+.hanzi-line{display:block;font-family:'Noto Sans SC';font-size:16px;line-height:1.5;margin-bottom:14px}
+
+.metric-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.metric{flex:1;min-width:120px;background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+.metric .n{font-family:'Syne';font-size:22px;font-weight:700}
+.metric .l{font-size:10px;color:var(--text2);margin-top:2px;letter-spacing:.05em;text-transform:uppercase}
+
+.sc-list{margin-top:10px}
+.sc-item{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;margin-bottom:7px}
+.sc-item .pt{font-family:'Noto Sans SC';color:var(--gold);font-weight:600;font-size:14px;margin-bottom:3px}
+.sc-item .wh{font-size:12px;color:var(--text1);line-height:1.6}
+
+/* timer */
+.timer-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:22px;text-align:center}
+.timer-display{font-family:'Syne';font-size:54px;font-weight:800;color:var(--gold);line-height:1;margin-bottom:8px}
+.timer-display.warn{color:var(--red2)}
+.timer-label{font-size:12px;color:var(--text2);margin-bottom:18px;letter-spacing:.06em}
+
+/* feedback */
+.fb-section{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:13px 16px;margin-bottom:10px}
+.fb-section h5{font-size:11px;color:var(--gold);margin-bottom:8px;letter-spacing:.05em}
+.fb-list{font-size:13px;line-height:1.8}
+.fb-list li{margin-bottom:5px;list-style:none}
+.fb-row{padding:6px 0;border-bottom:1px solid var(--line)}
+.fb-row:last-child{border:none}
+.fb-row .orig{color:var(--red2);text-decoration:line-through;margin-right:8px;font-family:'Noto Sans SC'}
+.fb-row .fix{color:var(--teal);font-family:'Noto Sans SC';font-weight:500}
+.fb-row .why{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* scene cards */
+.scene-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+@media(max-width:600px){.scene-grid{grid-template-columns:1fr}}
+.scene{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:13px;position:relative}
+.scene .num{position:absolute;top:10px;right:12px;font-family:'Syne';font-size:18px;font-weight:800;color:var(--text2)}
+.scene .t{font-size:11px;color:var(--gold);letter-spacing:.05em;margin-bottom:6px}
+.scene .d{font-size:13px;color:var(--text0);line-height:1.6;margin-bottom:8px}
+.scene .kw{display:flex;flex-wrap:wrap;gap:4px}
+.scene .kw .k{font-family:'Noto Sans SC';font-size:11px;background:var(--red-bg);color:var(--red2);border-radius:99px;padding:1px 7px}
+
+/* round indicator */
+.round-bar{display:flex;gap:8px;margin-bottom:14px}
+.round{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;text-align:center;font-size:11px;color:var(--text2)}
+.round.active{border-color:var(--red2);color:var(--red2);background:var(--red-bg)}
+.round.done{border-color:var(--teal);color:var(--teal2);background:var(--teal-bg)}
+.round .rn{font-family:'Syne';font-size:18px;font-weight:700;margin-bottom:2px}
+
+/* loading */
+.loading{display:inline-flex;align-items:center;gap:8px;color:var(--text1);font-size:13px}
+.loading::before{content:'';width:14px;height:14px;border:2px solid var(--bg3);border-top-color:var(--red2);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* empty */
+.empty{text-align:center;padding:50px 20px;color:var(--text2)}
+.empty .big{font-size:48px;margin-bottom:14px}
+.empty h3{font-family:'Syne';font-size:18px;color:var(--text0);margin-bottom:8px}
+.empty p{font-size:13px;line-height:1.8;margin-bottom:10px}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(10,10,12,.88);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--line2);border-radius:16px;padding:26px;max-width:480px;width:100%}
+.modal h3{font-family:'Syne';font-size:18px;color:var(--red2);margin-bottom:8px}
+.modal p{font-size:12.5px;color:var(--text1);line-height:1.7;margin-bottom:14px}
+.modal input,.modal select{width:100%;background:var(--bg3);border:1px solid var(--line2);border-radius:8px;color:var(--text0);font-family:inherit;font-size:13px;padding:10px 13px;outline:none;margin-bottom:12px}
+.modal input:focus,.modal select:focus{border-color:var(--red2)}
+.modal-row{display:flex;gap:8px}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--line2);border-radius:8px;padding:10px 20px;font-size:13px;color:var(--gold);z-index:600;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+
+.live{font-size:14px;color:var(--text0);background:var(--bg2);border:1px solid var(--line2);border-radius:8px;padding:10px 13px;min-height:60px;font-family:'Noto Sans SC';line-height:1.6}
+.live:empty::before{content:'録音すると、ここに認識結果が出ます';color:var(--text2);font-style:italic;font-family:'Inter'}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">中文 Coach <em>30日プログラム</em></div>
+    <div class="tools">
+      <select class="tselect" id="topic-sel" onchange="selectTopic(this.value)"></select>
+      <button class="btn btn-ghost btn-sm" onclick="openNewTopic()">＋ 新しい週/トピック</button>
+    </div>
+    <div class="langlinks">
+      <a class="langlink" href="flashcards.html">📇 単語帳</a>
+      <a class="langlink" href="chinese.html">🎤 会話</a>
+      <a class="langlink" href="index.html">EN</a>
+    </div>
+    <button class="gear" id="gear-btn" onclick="openKeyModal()" title="APIキー">⚙</button>
+  </div>
+  <div class="steps" id="steps"></div>
+  <div class="stage" id="stage"></div>
+</div>
+
+<div class="modal-bg" id="key-modal">
+  <div class="modal">
+    <h3>Anthropic APIキー</h3>
+    <p>このコーチは Claude API を使って雑談・添削・生成を行います。<br>キーはこの端末のブラウザにのみ保存され、外部送信は Anthropic API への直接通信のみです。<br>※ 中国語版アプリで保存したキー（zh_key）も自動的に使われます。</p>
+    <input type="password" id="key-input" placeholder="sk-ant-..." />
+    <div class="modal-row">
+      <button class="btn btn-red" style="flex:1" onclick="saveKey()">保存</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeKeyModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="new-modal">
+  <div class="modal">
+    <h3>新しいトピック（1週間）</h3>
+    <p>「1週間 = 1トピック」のルールで深掘りします。例：猫 / 大学生活 / 旅行 / プログラミング …</p>
+    <input id="nt-name" placeholder="今週のトピックを日本語で（例：猫）" />
+    <input id="nt-week" type="number" min="1" max="52" placeholder="週番号（例：1）" />
+    <div class="modal-row">
+      <button class="btn btn-red" style="flex:1" onclick="createTopic()">作成</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeNewTopic()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════ STATE ════════
+let apiKey = localStorage.getItem('zh_key') || localStorage.getItem('coach_key') || '';
+let topics = JSON.parse(localStorage.getItem('coach_topics') || '[]');
+let curId = localStorage.getItem('coach_cur') || null;
+let curStep = 1;
+
+// recording state
+let rec=null, recording=false, sttBuf='', recCb=null;
+let timerHandle=null;
+
+const STEP_NAMES = ['','日本語で会話ネタ抽出','必要単語表を生成','Narrow Reading 7本','音読＋発音変化','1分中国語スピーチ','321リテリング','ロールプレイ＋FB'];
+
+function blankTopic(name, week){
+  return { id:'t'+Date.now(), name, week:week||1, createdAt:Date.now(),
+    s1:{ messages:[], summary:null },
+    s2:{ vocab:null },
+    s3:{ days:null, picked:0 },
+    s4:{ perDay:{} },
+    s5:{ transcript:'', result:null, prompt:'' },
+    s6:{ scenes:null, rounds:[null,null,null] },
+    s7:{ setting:'', messages:[], feedback:null }
+  };
+}
+if(!topics.length){ const t=blankTopic('猫',1); topics.push(t); curId=t.id; persist(); }
+if(!curId || !topics.find(t=>t.id===curId)) curId=topics[0].id;
+
+function persist(){ localStorage.setItem('coach_topics',JSON.stringify(topics)); if(curId) localStorage.setItem('coach_cur',curId); }
+function cur(){ return topics.find(t=>t.id===curId); }
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function aq(s){ return JSON.stringify(s==null?'':String(s)).replace(/"/g,'&quot;'); }
+function toast(m){ const e=document.createElement('div'); e.className='toast'; e.textContent=m; document.body.appendChild(e); setTimeout(()=>e.remove(),2400); }
+
+// ════════ CLAUDE ════════
+async function callClaude({system, messages, max_tokens=1400, model='claude-sonnet-4-6'}){
+  if(!apiKey) throw new Error('APIキーが未設定です（右上の⚙）');
+  const body = { model, max_tokens, messages };
+  if(system) body.system = system;
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body: JSON.stringify(body)
+  });
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error?.message || ('HTTP '+r.status)); }
+  const d = await r.json();
+  return d.content.map(c=>c.text||'').join('');
+}
+function parseJson(raw){
+  let s = raw.replace(/```json|```/g,'').trim();
+  const i = s.search(/[\[{]/); if(i>=0) s = s.slice(i);
+  // trim trailing prose after last } or ]
+  let depth=0, last=-1, inStr=false, esc=false;
+  for(let k=0;k<s.length;k++){ const c=s[k];
+    if(inStr){ if(esc){esc=false;continue;} if(c==='\\'){esc=true;continue;} if(c==='"'){inStr=false;continue;} continue; }
+    if(c==='"'){inStr=true;continue;}
+    if(c==='{'||c==='[') depth++;
+    else if(c==='}'||c===']'){ depth--; if(depth===0) last=k; }
+  }
+  if(last>=0) s = s.slice(0,last+1);
+  return JSON.parse(s);
+}
+
+// ════════ SPEECH ════════
+function speak(text, rate){
+  if(!('speechSynthesis' in window)){ toast('読み上げ非対応のブラウザです'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.lang='zh-CN'; u.rate=rate||1.0;
+  const vs=speechSynthesis.getVoices();
+  const v=vs.find(x=>/zh[-_]CN/i.test(x.lang))||vs.find(x=>/^zh/i.test(x.lang));
+  if(v) u.voice=v; speechSynthesis.speak(u);
+}
+function startRec(onLive){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ toast('音声認識はChrome/Edge推奨'); return false; }
+  rec = new SR(); rec.lang='zh-CN'; rec.continuous=true; rec.interimResults=true;
+  sttBuf=''; recording=true;
+  rec.onresult = (e)=>{ let fin=sttBuf, interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){ const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) fin+=t; else interim+=t; }
+    sttBuf=fin; if(onLive) onLive(sttBuf+interim);
+  };
+  rec.onerror = (e)=>{ if(e.error!=='no-speech'&&e.error!=='aborted') toast('音声エラー: '+e.error); };
+  rec.onend = ()=>{ if(recording){ try{ rec.start(); }catch(_){} } };
+  try{ rec.start(); }catch(_){}
+  return true;
+}
+function stopRec(){ recording=false; if(rec){ try{ rec.stop(); }catch(_){} } if(recCb){ recCb(sttBuf.trim()); recCb=null; } }
+
+// ════════ HEADER UI ════════
+function renderTopicSel(){
+  const sel = document.getElementById('topic-sel');
+  sel.innerHTML = topics.map(t=>`<option value="${t.id}" ${t.id===curId?'selected':''}>Week ${t.week} ・ ${esc(t.name)}</option>`).join('');
+}
+function renderSteps(){
+  const t=cur(); const el=document.getElementById('steps');
+  el.innerHTML = STEP_NAMES.slice(1).map((nm,i)=>{
+    const n=i+1; const done = isStepDone(t,n);
+    return `<div class="step ${curStep===n?'active':''} ${done?'done':''}" onclick="goStep(${n})"><span class="n">${done?'✓':n}</span>${esc(nm)}</div>`;
+  }).join('');
+  document.getElementById('gear-btn').classList.toggle('warn', !apiKey);
+}
+function isStepDone(t,n){
+  if(!t) return false;
+  if(n===1) return !!t.s1.summary;
+  if(n===2) return !!(t.s2.vocab && t.s2.vocab.length);
+  if(n===3) return !!(t.s3.days && t.s3.days.length);
+  if(n===4) return Object.keys(t.s4.perDay||{}).length>0;
+  if(n===5) return !!t.s5.result;
+  if(n===6) return !!(t.s6.scenes && t.s6.rounds.some(r=>r));
+  if(n===7) return !!t.s7.feedback;
+  return false;
+}
+function goStep(n){ curStep=n; renderSteps(); renderStage(); }
+function selectTopic(id){ curId=id; curStep=1; persist(); renderSteps(); renderStage(); }
+
+// ════════ STAGE ROUTER ════════
+function renderStage(){
+  const t=cur(); if(!t){ document.getElementById('stage').innerHTML=''; return; }
+  if(!apiKey){
+    document.getElementById('stage').innerHTML = `<div class="wrap"><div class="empty">
+      <div class="big">🔑</div>
+      <h3>APIキーを設定してください</h3>
+      <p>STEP1〜7は Claude が雑談・添削・生成を行うため、Anthropic API キーが必要です。<br>右上の⚙から保存してください。</p>
+      <button class="btn btn-red" onclick="openKeyModal()" style="margin-top:14px">⚙ キーを設定する</button>
+    </div></div>`;
+    return;
+  }
+  if(curStep===1) renderS1(t);
+  else if(curStep===2) renderS2(t);
+  else if(curStep===3) renderS3(t);
+  else if(curStep===4) renderS4(t);
+  else if(curStep===5) renderS5(t);
+  else if(curStep===6) renderS6(t);
+  else if(curStep===7) renderS7(t);
+}
+
+// ════════ STEP 1: Japanese chat extraction ════════
+async function renderS1(t){
+  const stage = document.getElementById('stage');
+  stage.innerHTML = `<div class="wrap">
+    <div class="card">
+      <h3>STEP 1 ・ 日本語で雑談 → 会話ネタを抽出</h3>
+      <div class="sub">普段の話し方・興味・口癖を集めます。トピック「<b style="color:var(--gold)">${esc(t.name)}</b>」について、コーチが日本語で1問ずつ質問します。5〜7回ほど答えたら「まとめる」を押してください。</div>
+      <div class="chat" id="s1-chat"></div>
+      <div class="input-row">
+        <textarea id="s1-input" placeholder="日本語で答える…（Enterで送信、Shift+Enterで改行）"></textarea>
+        <button class="btn btn-red" id="s1-send" onclick="s1Send()">送信</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn btn-gold" id="s1-summarize" onclick="s1Summarize()" ${t.s1.messages.length<4?'disabled':''}>📋 これまでの話をまとめる</button>
+        <button class="btn btn-ghost btn-sm" onclick="if(confirm('STEP1の会話を全部消しますか？')){cur().s1={messages:[],summary:null};persist();renderS1(cur());}">最初からやり直す</button>
+      </div>
+    </div>
+    ${t.s1.summary ? renderS1Summary(t.s1.summary) : ''}
+  </div>`;
+  // initial greeting
+  if(t.s1.messages.length===0){
+    document.getElementById('s1-chat').innerHTML = `<div class="msg ai"><div class="av">C</div><div class="bub"><span class="loading">コーチがあいさつ中…</span></div></div>`;
+    try{
+      const greet = await callClaude({
+        system: `あなたは中国語学習コーチ。これからユーザーと日本語で雑談し、ユーザーの興味・口癖・自分専用の頻出単語を集めます。今日のトピックは「${t.name}」。
+ルール：日本語のみ／1回1問だけ／短く具体的に／共感的に／答えに含まれる具体名詞・好み・感情を掘り下げる／挨拶のあと最初の1問を出す。`,
+        messages: [{role:'user', content:`こんにちは。今週は「${t.name}」について話したいです。最初の質問をください。`}],
+        max_tokens: 300
+      });
+      t.s1.messages.push({role:'ai', text:greet});
+      persist(); renderS1Chat();
+    }catch(e){ document.getElementById('s1-chat').innerHTML=`<div class="msg ai"><div class="av">!</div><div class="bub">エラー：${esc(e.message)}</div></div>`; }
+  } else { renderS1Chat(); }
+  const input=document.getElementById('s1-input');
+  input?.addEventListener('keydown', e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); s1Send(); }});
+}
+function renderS1Chat(){
+  const t=cur();
+  const el = document.getElementById('s1-chat'); if(!el) return;
+  el.innerHTML = t.s1.messages.map(m=>`<div class="msg ${m.role}"><div class="av">${m.role==='ai'?'C':'You'}</div><div class="bub">${esc(m.text).replace(/\n/g,'<br>')}</div></div>`).join('');
+  el.scrollTop = el.scrollHeight;
+  document.getElementById('s1-summarize').disabled = t.s1.messages.filter(m=>m.role==='user').length<2;
+}
+async function s1Send(){
+  const t=cur(); const input=document.getElementById('s1-input'); const txt=input.value.trim();
+  if(!txt) return;
+  t.s1.messages.push({role:'user', text:txt}); input.value=''; persist(); renderS1Chat();
+  // streaming feel
+  const el=document.getElementById('s1-chat');
+  el.insertAdjacentHTML('beforeend', `<div class="msg ai" id="s1-think"><div class="av">C</div><div class="bub"><span class="loading">考え中…</span></div></div>`);
+  el.scrollTop=el.scrollHeight;
+  try{
+    const reply = await callClaude({
+      system: `あなたは中国語学習コーチ。ユーザーと日本語で雑談しながら、興味・口癖・自分専用の頻出単語を集めています。今日のトピックは「${t.name}」。
+ルール：日本語のみ／1回1問だけ／短く（2〜4文）／前の答えの具体名詞・好み・感情を掘り下げる／質問は最後に。`,
+      messages: t.s1.messages.map(m=>({role: m.role==='ai'?'assistant':'user', content:m.text})),
+      max_tokens: 320
+    });
+    t.s1.messages.push({role:'ai', text:reply}); persist();
+  }catch(e){ t.s1.messages.push({role:'ai', text:'(エラー：'+e.message+')'}); }
+  document.getElementById('s1-think')?.remove();
+  renderS1Chat();
+}
+async function s1Summarize(){
+  const t=cur(); const btn=document.getElementById('s1-summarize');
+  btn.disabled=true; btn.innerHTML='<span class="loading">抽出中…</span>';
+  try{
+    const raw = await callClaude({
+      system: `これまでの日本語会話を分析し、JSONのみを返してください。説明文・コードフェンス禁止。
+{ "themes": ["よく出るテーマ"], "myWords": ["自分専用の頻出単語（日本語の名詞・形容詞中心、5〜12個）"], "talkIdeas": ["中国語で話せそうな具体的な会話ネタ（5〜8個）"], "keyExpr": ["中国語化すべき重要表現（日本語、5〜10個）"] }`,
+      messages: [{ role:'user', content: t.s1.messages.map(m=>(m.role==='ai'?'コーチ':'ユーザー')+': '+m.text).join('\n') }],
+      max_tokens: 1000
+    });
+    const sum = parseJson(raw);
+    t.s1.summary = sum; persist(); renderS1(t);
+    toast('STEP1の要約ができました ✓');
+  }catch(e){ toast('抽出エラー: '+e.message); btn.disabled=false; btn.textContent='📋 これまでの話をまとめる'; }
+}
+function renderS1Summary(s){
+  return `<div class="card">
+    <h3>📋 STEP 1 要約</h3>
+    <div class="sum-grid">
+      <div class="sum-box"><h5>🎯 よく出るテーマ</h5><ul>${(s.themes||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+      <div class="sum-box"><h5>🗝️ 自分専用 頻出単語</h5><ul>${(s.myWords||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+      <div class="sum-box"><h5>💬 会話ネタ候補</h5><ul>${(s.talkIdeas||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+      <div class="sum-box"><h5>⭐ 中国語化すべき重要表現</h5><ul>${(s.keyExpr||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+    </div>
+    <div class="row" style="margin-top:14px"><button class="btn btn-red" onclick="goStep(2)">次へ：STEP 2 単語表を作る →</button></div>
+  </div>`;
+}
+
+// ════════ STEP 2: vocab table ════════
+function renderS2(t){
+  const stage=document.getElementById('stage');
+  const ready = !!t.s1.summary;
+  stage.innerHTML = `<div class="wrap">
+    <div class="card">
+      <h3>STEP 2 ・ 必要単語表を生成</h3>
+      <div class="sub">STEP1で集まったあなた専用の頻出語を中国語化します。表は実用頻度順、HSKレベル付き、例文付き。終わったら「📇 フラッシュカードに送る」で単語帳として保存できます。</div>
+      ${!ready?'<div class="empty"><div class="big">📋</div><p>先に STEP 1 を済ませてください。</p><button class="btn btn-ghost" onclick="goStep(1)">← STEP 1へ</button></div>':`
+        <div class="row">
+          <button class="btn btn-red" onclick="s2Generate()" id="s2-gen">${t.s2.vocab?'🔄 再生成':'⚡ 単語表を生成する'}</button>
+          ${t.s2.vocab?`<button class="btn btn-teal" onclick="s2ToFlashcards()">📇 フラッシュカードに送る</button>
+            <button class="btn btn-ghost" onclick="s2ExportCsv()">↓ CSV書き出し</button>
+            <button class="btn btn-ghost" onclick="goStep(3)">次へ：STEP 3 →</button>`:''}
+        </div>
+      `}
+    </div>
+    ${t.s2.vocab?renderS2Table(t.s2.vocab):''}
+  </div>`;
+}
+async function s2Generate(){
+  const t=cur(); const btn=document.getElementById('s2-gen');
+  btn.disabled=true; btn.innerHTML='<span class="loading">生成中…（30〜60秒）</span>';
+  try{
+    const raw = await callClaude({
+      system:`あなたは中国語語彙コーチ。出力はJSON配列のみ。フェンス・前置き・解説禁止。`,
+      messages:[{role:'user', content:
+`トピック「${t.name}」を中国語で話すための重要単語表を作ってください。
+ユーザーの情報（STEP1まとめ）：${JSON.stringify(t.s1.summary)}
+
+出力はJSON配列のみ：
+[ {"zh":"中国語(汉字)", "py":"拼音(声調記号)", "ja":"日本語訳", "ex":"短い中国語例文10〜20字", "hsk":1} ]
+
+条件：
+- 20〜30語
+- 実用頻度順（よく使うもの先頭）
+- ユーザーの「自分専用の頻出単語」「中国語化すべき重要表現」を優先的に含める
+- HSK 1〜6 のレベルを付与
+- 例文は短く、その語をそのまま使ったもの`
+      }], max_tokens: 3500
+    });
+    const v = parseJson(raw);
+    t.s2.vocab = v; persist(); renderS2(t);
+    toast(`${v.length} 語を生成しました ✓`);
+  }catch(e){ toast('生成エラー: '+e.message); btn.disabled=false; btn.textContent='⚡ 単語表を生成する'; }
+}
+function renderS2Table(v){
+  return `<div class="card">
+    <h3>${v.length} 語</h3>
+    <div style="overflow-x:auto"><table class="vt">
+      <thead><tr><th style="width:34px">#</th><th>中国語 / 拼音</th><th>日本語</th><th>例文</th><th style="width:48px">HSK</th><th style="width:40px"></th></tr></thead>
+      <tbody>${v.map((w,i)=>`<tr>
+        <td style="color:var(--text2);font-family:'Syne'">${i+1}</td>
+        <td><div class="zh">${esc(w.zh)}</div><div class="py">${esc(w.py||'')}</div></td>
+        <td>${esc(w.ja||'')}</td>
+        <td class="ex">${esc(w.ex||'')}</td>
+        <td><span class="hsk">${esc(String(w.hsk||'-'))}</span></td>
+        <td><button class="btn btn-ghost btn-sm" style="padding:3px 7px" onclick="speak(${aq(w.zh)})" title="読み上げ">🔊</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  </div>`;
+}
+function s2ToFlashcards(){
+  const t=cur(); const v=t.s2.vocab||[];
+  let decks = JSON.parse(localStorage.getItem('fc_decks')||'null') || [];
+  const cards = v.map(w=>({
+    id:'c'+Date.now()+Math.random().toString(36).slice(2,6),
+    front: w.zh, mean: ((w.py?w.py+' / ':'')+(w.ja||'')).trim(),
+    ex: w.ex||'', box:0, due:0, reps:0
+  }));
+  const deck = { id:'d'+Date.now(), name:`Week${t.week} ${t.name} / コーチ`, lang:'zh-CN', cards };
+  decks.push(deck);
+  localStorage.setItem('fc_decks', JSON.stringify(decks));
+  toast(`フラッシュカードに ${cards.length} 枚を追加しました ✓`);
+}
+function s2ExportCsv(){
+  const v=cur().s2.vocab||[]; const q=s=>{ s=String(s||''); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const csv='﻿中国語,拼音,日本語,例文,HSK\n'+ v.map(w=>[q(w.zh),q(w.py),q(w.ja),q(w.ex),q(w.hsk)].join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`Week${cur().week}_${cur().name}_vocab.csv`; a.click();
+}
+
+// ════════ STEP 3: Narrow reading ════════
+function renderS3(t){
+  const stage=document.getElementById('stage');
+  const ready = !!(t.s2.vocab && t.s2.vocab.length);
+  stage.innerHTML = `<div class="wrap">
+    <div class="card">
+      <h3>STEP 3 ・ Narrow Reading（同テーマ7パターン）</h3>
+      <div class="sub">STEP2の単語を繰り返し使い、トピック「<b style="color:var(--gold)">${esc(t.name)}</b>」の中身だけ少しずつ変えた中国語文章を7本作ります。同じ語彙の自然反復で定着させます。HSK3〜4、各150〜250字。</div>
+      ${!ready?'<div class="empty"><div class="big">📚</div><p>先に STEP 2 で単語表を作ってください。</p><button class="btn btn-ghost" onclick="goStep(2)">← STEP 2へ</button></div>':`
+        <div class="row">
+          <button class="btn btn-red" onclick="s3Generate()" id="s3-gen">${t.s3.days?'🔄 7本を再生成':'⚡ 7本を生成する（60〜90秒）'}</button>
+          ${t.s3.days?`<button class="btn btn-ghost" onclick="goStep(4)">次へ：STEP 4 音読＋発音 →</button>`:''}
+        </div>
+      `}
+    </div>
+    ${t.s3.days?renderS3Days(t):''}
+  </div>`;
+}
+async function s3Generate(){
+  const t=cur(); const btn=document.getElementById('s3-gen');
+  btn.disabled=true; btn.innerHTML='<span class="loading">7本生成中…</span>';
+  try{
+    const raw = await callClaude({
+      system:`あなたは中国語教材ライター。出力はJSON配列のみ。フェンス・前置き禁止。`,
+      messages:[{role:'user', content:
+`トピック「${t.name}」で内容を変えた中国語文章を7本作ってください。
+使ってほしい語彙（できるだけ何度も登場させる）：${t.s2.vocab.map(v=>v.zh).join('、')}
+
+条件：
+- HSK3〜4レベル
+- 各150〜250字（汉字）
+- 同じ重要単語をDay間で繰り返し使う（語彙定着のため）
+- テーマ（内容）は固定で順に変える：
+  Day1=性格・特徴 / Day2=普段の習慣 / Day3=具体的なエピソード / Day4=他のものとの比較 / Day5=感情・気持ち / Day6=困っていること・問題 / Day7=会話の場面（短いダイアログを含む）
+
+JSON配列のみ：[ {"theme":"Day1 性格", "text":"中国語本文…"} ] ×7`
+      }], max_tokens: 5000
+    });
+    const days = parseJson(raw);
+    t.s3.days = days; t.s3.picked = 0; persist(); renderS3(t);
+    toast('Narrow Reading 7本ができました ✓');
+  }catch(e){ toast('生成エラー: '+e.message); btn.disabled=false; btn.textContent='⚡ 7本を生成する'; }
+}
+function renderS3Days(t){
+  const cur = t.s3.picked || 0; const d = t.s3.days[cur];
+  return `<div class="card">
+    <div class="day-tabs">${t.s3.days.map((x,i)=>`<div class="day-tab ${i===cur?'active':''}" onclick="s3Pick(${i})"><span class="dn">D${i+1}</span>${esc((x.theme||'').replace(/^Day\d+\s*/,''))}</div>`).join('')}</div>
+    <div class="row" style="margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="speak(${aq(d.text)},0.95)">🔊 通常速度</button>
+      <button class="btn btn-ghost btn-sm" onclick="speak(${aq(d.text)},0.7)">🐢 0.7倍</button>
+      <button class="btn btn-ghost btn-sm" onclick="speak(${aq(d.text)},1.2)">🐇 1.2倍</button>
+      <span style="font-size:11px;color:var(--text2);margin-left:auto">${cjkCount(d.text)} 字</span>
+    </div>
+    <div class="passage">${esc(d.text)}</div>
+    <div class="row" style="margin-top:12px"><button class="btn btn-red" onclick="goStep(4)">この文章で STEP 4 へ →</button></div>
+  </div>`;
+}
+function s3Pick(i){ cur().s3.picked=i; persist(); renderS3(cur()); }
+function cjkCount(s){ return (String(s||'').match(/[一-鿿]/g)||[]).length; }
+
+// ════════ STEP 4: pinyin & sound changes ════════
+function renderS4(t){
+  const stage=document.getElementById('stage');
+  const ready = !!(t.s3.days && t.s3.days.length);
+  if(!ready){ stage.innerHTML='<div class="wrap"><div class="empty"><div class="big">🔊</div><p>先に STEP 3 を済ませてください。</p><button class="btn btn-ghost" onclick="goStep(3)">← STEP 3へ</button></div></div>'; return; }
+  const di = t.s3.picked || 0;
+  const day = t.s3.days[di];
+  const chars = cjkCount(day.text);
+  const target = Math.max(120, Math.min(220, Math.round(chars/30*60))); // rough WPM-equivalent target
+  const cached = t.s4.perDay[di];
+  stage.innerHTML = `<div class="wrap">
+    <div class="card">
+      <h3>STEP 4 ・ 音読＋発音変化（Day ${di+1}：${esc(day.theme)}）</h3>
+      <div class="sub">単語数（字数）と目標音読速度を出し、拼音付きの音読版と発音変化（变调・轻声・儿化・连音）を解説します。最後にリスニングメニュー（0.7倍→1.0倍→1.2倍）。</div>
+      <div class="metric-row">
+        <div class="metric"><div class="n" style="color:var(--gold)">${chars}</div><div class="l">字数</div></div>
+        <div class="metric"><div class="n" style="color:var(--teal2)">${target}</div><div class="l">目標 字/分</div></div>
+        <div class="metric"><div class="n" style="color:var(--indigo)">${Math.round(chars/target*60)}<span style="font-size:14px;color:var(--text2)">秒</span></div><div class="l">目標読み時間</div></div>
+      </div>
+      <div class="day-tabs">${t.s3.days.map((x,i)=>`<div class="day-tab ${i===di?'active':''}" onclick="s4Pick(${i})"><span class="dn">D${i+1}</span></div>`).join('')}</div>
+      <div class="passage">${esc(day.text)}</div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn btn-red" id="s4-gen" onclick="s4Generate()">${cached?'🔄 拼音と発音解説を再生成':'⚡ 拼音と発音解説を生成'}</button>
+      </div>
+    </div>
+    ${cached?`
+      <div class="card">
+        <h3>📖 音読用版（拼音付き）</h3>
+        <div style="white-space:pre-wrap;line-height:2.1">${formatPinyinText(cached.pinyinText)}</div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn btn-ghost" onclick="speak(${aq(day.text)},0.7)">🐢 0.7倍で聞く</button>
+          <button class="btn btn-ghost" onclick="speak(${aq(day.text)},1.0)">▶ 1.0倍で聞く</button>
+          <button class="btn btn-ghost" onclick="speak(${aq(day.text)},1.2)">🐇 1.2倍で聞く</button>
+          <span style="font-size:12px;color:var(--text2);margin-left:auto">推奨：0.7→1.0→1.2 の順で各3回ずつ</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>🎵 発音変化のポイント</h3>
+        <div class="sc-list">${(cached.soundChanges||[]).map(s=>`<div class="sc-item"><div class="pt">${esc(s.point)}</div><div class="wh">${esc(s.why)}</div></div>`).join('')||'<div style="font-size:12px;color:var(--text2)">解説なし</div>'}</div>
+        <div class="row" style="margin-top:14px"><button class="btn btn-red" onclick="goStep(5)">次へ：STEP 5 １分スピーチ →</button></div>
+      </div>
+    `:''}
+  </div>`;
+}
+function s4Pick(i){ cur().s3.picked=i; persist(); renderS4(cur()); }
+function formatPinyinText(s){
+  // expect lines alternating pinyin / hanzi OR just blocks
+  return esc(s).replace(/\n/g,'<br>');
+}
+async function s4Generate(){
+  const t=cur(); const di=t.s3.picked||0; const day=t.s3.days[di];
+  const btn=document.getElementById('s4-gen'); btn.disabled=true; btn.innerHTML='<span class="loading">解析中…</span>';
+  try{
+    const raw = await callClaude({
+      system:'出力はJSONのみ。フェンス禁止。',
+      messages:[{role:'user', content:
+`次の中国語文章に対して、(1) 音読用に拼音を付ける（行ごとに「拼音行」→「汉字行」のペアを書き、文章全体をカバー）、(2) 発音変化のポイント（变调＝3声連続/不/一の変調、轻声、儿化、连音、有気音/無気音の注意）を日本語で3〜6項目解説する。
+
+文章：
+${day.text}
+
+JSON のみ：
+{
+  "pinyinText": "拼音行1\\n汉字行1\\n\\n拼音行2\\n汉字行2\\n…",
+  "soundChanges": [ {"point":"该词或句子(汉字)", "why":"日本語の解説。なぜどう変わるかを具体的に。"} ]
+}`
+      }], max_tokens: 3000
+    });
+    const r = parseJson(raw);
+    t.s4.perDay[di] = r; persist(); renderS4(t);
+    toast('拼音と発音解説ができました ✓');
+  }catch(e){ toast('生成エラー: '+e.message); btn.disabled=false; btn.textContent='⚡ 拼音と発音解説を生成'; }
+}
+
+// ════════ STEP 5: 1-minute speech ════════
+function renderS5(t){
+  const stage=document.getElementById('stage');
+  const day = t.s3.days?.[t.s3.picked||0];
+  const promptDefault = day ? `${day.theme}について、自分の言葉で1分話す` : `「${t.name}」について自分の言葉で1分話す`;
+  if(!t.s5.prompt) t.s5.prompt = promptDefault;
+  stage.innerHTML = `<div class="wrap">
+    <div class="card">
+      <h3>STEP 5 ・ １分間 中国語スピーチ</h3>
+      <div class="sub">完璧を目指さない。詰まっても続行。「思い出そうとする負荷」が一番のトレーニングです。終了後、Claudeが添削＋3つの改善点＋復習スクリプトを返します。</div>
+      <div class="field" style="margin-bottom:10px">
+        <label style="font-size:12px;color:var(--text1);display:block;margin-bottom:5px">お題</label>
+        <input id="s5-prompt" value="${esc(t.s5.prompt)}" style="width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:8px;color:var(--text0);font-family:inherit;font-size:14px;padding:10px 13px;outline:none" />
+      </div>
+      <div class="timer-card">
+        <div class="timer-display" id="s5-timer">01:00</div>
+        <div class="timer-label">60秒。スタートで自動カウントダウン＋録音開始</div>
+        <div class="row" style="justify-content:center">
+          <button class="btn btn-red" id="s5-start" onclick="s5StartTimer()">🎤 スタート（60秒）</button>
+          <button class="btn btn-ghost" id="s5-stop" onclick="s5StopTimer()" disabled>■ 停止</button>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <label style="font-size:12px;color:var(--text1);display:block;margin-bottom:5px">あなたの発話（自動認識・編集可）</label>
+        <textarea id="s5-text" class="live hz" style="resize:vertical;min-height:90px;width:100%">${esc(t.s5.transcript||'')}</textarea>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn btn-gold" id="s5-grade" onclick="s5Grade()">📊 添削する</button>
+      </div>
+    </div>
+    ${t.s5.result?renderS5Result(t.s5.result):''}
+  </div>`;
+  document.getElementById('s5-prompt').addEventListener('input', e=>{ cur().s5.prompt=e.target.value; persist(); });
+  document.getElementById('s5-text').addEventListener('input', e=>{ cur().s5.transcript=e.target.value; });
+}
+function s5StartTimer(){
+  if(recording) return;
+  const okstt = startRec((live)=>{ document.getElementById('s5-text').value=live; });
+  if(!okstt){ recording=false; return; }
+  document.getElementById('s5-start').disabled=true;
+  document.getElementById('s5-stop').disabled=false;
+  let remain = 60; const disp=document.getElementById('s5-timer');
+  const tick=()=>{
+    const m=String(Math.floor(remain/60)).padStart(2,'0'); const s=String(remain%60).padStart(2,'0');
+    disp.textContent=`${m}:${s}`; disp.classList.toggle('warn', remain<=10);
+    if(remain<=0){ clearInterval(timerHandle); s5StopTimer(); return; }
+    remain--;
+  };
+  tick(); timerHandle=setInterval(tick,1000);
+}
+function s5StopTimer(){
+  if(timerHandle){ clearInterval(timerHandle); timerHandle=null; }
+  document.getElementById('s5-start').disabled=false;
+  document.getElementById('s5-stop').disabled=true;
+  document.getElementById('s5-timer').textContent='01:00';
+  document.getElementById('s5-timer').classList.remove('warn');
+  if(recording){ recCb=(final)=>{ const t=cur(); t.s5.transcript=final||document.getElementById('s5-text').value; persist(); document.getElementById('s5-text').value=t.s5.transcript; toast('録音終了。「📊 添削する」を押してください'); }; stopRec(); }
+}
+async function s5Grade(){
+  const t=cur(); const text=(document.getElementById('s5-text').value||'').trim();
+  if(!text){ toast('まず録音するか、解答を入力してください'); return; }
+  t.s5.transcript=text; persist();
+  const btn=document.getElementById('s5-grade'); btn.disabled=true; btn.innerHTML='<span class="loading">添削中…</span>';
+  try{
+    const raw = await callClaude({
+      system:'出力はJSONのみ。フェンス・前置き禁止。',
+      messages:[{role:'user', content:
+`ユーザーは「${t.s5.prompt}」というお題で1分間中国語でスピーチしました。
+発話（自動認識のため誤字あり）：${text}
+
+添削してください。JSONのみ：
+{
+  "corrected": "明らかな誤りだけ直したバージョン（中国語、原文の構成は尊重）",
+  "naturalRewrite": "ネイティブが自然に言うバージョン（中国語、80〜130字）",
+  "tips": ["改善点1（日本語、具体的に）", "改善点2", "改善点3"],
+  "reviewScript": "復習用スクリプト（中国語、80〜120字、重要表現を繰り返し含む）",
+  "reviewPinyin": "復習スクリプトの拼音"
+}`
+      }], max_tokens: 2500
+    });
+    const r = parseJson(raw);
+    t.s5.result = r; persist(); renderS5(t);
+    toast('添削が完成しました ✓');
+  }catch(e){ toast('添削エラー: '+e.message); btn.disabled=false; btn.textContent='📊 添削する'; }
+}
+function renderS5Result(r){
+  return `<div class="card">
+    <h3>📋 添削結果</h3>
+    <div class="fb-section"><h5>✓ 修正版（最低限の直し）</h5><div class="hz" style="font-size:15px;line-height:1.9">${esc(r.corrected||'')}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="speak(${aq(r.corrected||'')})">🔊 聞く</button></div>
+    <div class="fb-section"><h5>⭐ ネイティブ風 言い換え</h5><div class="hz" style="font-size:15px;line-height:1.9">${esc(r.naturalRewrite||'')}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="speak(${aq(r.naturalRewrite||'')})">🔊 聞く</button></div>
+    <div class="fb-section"><h5>💡 改善点3つ</h5><ol class="fb-list" style="padding-left:20px;list-style:decimal">${(r.tips||[]).map(t=>`<li>${esc(t)}</li>`).join('')}</ol></div>
+    <div class="fb-section"><h5>🔁 復習スクリプト</h5>${r.reviewPinyin?`<div style="font-size:12px;color:var(--gold);font-family:'Noto Sans SC';line-height:1.6;margin-bottom:6px">${esc(r.reviewPinyin)}</div>`:''}<div class="hz" style="font-size:15px;line-height:1.9">${esc(r.reviewScript||'')}</div>
+      <div class="row" style="margin-top:8px"><button class="btn btn-ghost btn-sm" onclick="speak(${aq(r.reviewScript||'')})">🔊 聞く</button><button class="btn btn-ghost btn-sm" onclick="speak(${aq(r.reviewScript||'')},0.75)">🐢 ゆっくり</button></div></div>
+    <div class="row"><button class="btn btn-red" onclick="goStep(6)">次へ：STEP 6 321リテリング →</button></div>
+  </div>`;
+}
+
+// ════════ STEP 6: 321 retelling ════════
+function renderS6(t){
+  const stage=document.getElementById('stage');
+  const source = t.s5.transcript || t.s5.result?.naturalRewrite || t.s3.days?.[t.s3.picked||0]?.text || '';
+  stage.innerHTML = `<div class="wrap">
+    <div class="card">
+      <h3>STEP 6 ・ 321リテリング（4コマでイメージ→中国語）</h3>
+      <div class="sub">STEP5の内容をベースに、セリフ無しの4コマ絵を「文章で」描写したカードを作ります。<br>あなたは絵のイメージだけを見て中国語で説明（3分→2分→1分）。日本語訳しない、イメージ直結思考のトレーニングです。</div>
+      ${!source?'<div class="empty"><div class="big">🎬</div><p>STEP 5 の発話か STEP 3 の文章が必要です。</p><button class="btn btn-ghost" onclick="goStep(5)">← STEP 5へ</button></div>':`
+        <div class="row">
+          <button class="btn btn-red" onclick="s6Scenes()" id="s6-scene">${t.s6.scenes?'🔄 4コマを再生成':'⚡ 4コマを生成'}</button>
+        </div>
+      `}
+    </div>
+    ${t.s6.scenes?renderS6Scenes(t):''}
+  </div>`;
+}
+async function s6Scenes(){
+  const t=cur();
+  const source = t.s5.result?.naturalRewrite || t.s5.transcript || t.s3.days?.[t.s3.picked||0]?.text || '';
+  const btn=document.getElementById('s6-scene'); btn.disabled=true; btn.innerHTML='<span class="loading">生成中…</span>';
+  try{
+    const raw = await callClaude({
+      system:'出力はJSON配列のみ。',
+      messages:[{role:'user', content:
+`次の中国語の内容を、セリフ無しの4コマ漫画のシーン記述に分解してください。各コマは「絵で見えるもの」だけを日本語2〜3文で描写し、中国語のキーワード3〜5語を添える。
+
+原文：${source}
+
+JSON 配列のみ：[ {"title":"日本語の短いタイトル", "scene_ja":"絵に描かれている状況の日本語描写（人物の動作、場所、表情、ものなど、絵で表現できる要素だけ）", "keywords":["中国語キーワード1", "中国語キーワード2", ...] } ] ×4`
+      }], max_tokens: 1800
+    });
+    const s = parseJson(raw);
+    t.s6.scenes = s; t.s6.rounds=[null,null,null]; persist(); renderS6(t);
+  }catch(e){ toast('生成エラー: '+e.message); btn.disabled=false; btn.textContent='⚡ 4コマを生成'; }
+}
+function renderS6Scenes(t){
+  const ROUNDS=[180,120,60];
+  const activeRound = t.s6.rounds.findIndex(r=>!r);
+  return `<div class="card">
+    <h3>🎬 4コマ シーン記述</h3>
+    <div class="scene-grid">${t.s6.scenes.map((s,i)=>`<div class="scene"><div class="num">${i+1}</div><div class="t">${esc(s.title||'')}</div><div class="d">${esc(s.scene_ja||'')}</div><div class="kw">${(s.keywords||[]).map(k=>`<span class="k">${esc(k)}</span>`).join('')}</div></div>`).join('')}</div>
+    <div class="round-bar">${[3,2,1].map((m,i)=>`<div class="round ${activeRound===i?'active':activeRound>i||activeRound===-1?'done':''}"><div class="rn">${m}分</div>Round ${i+1}</div>`).join('')}</div>
+    ${activeRound===-1?renderS6Done(t):renderS6Round(t,activeRound)}
+  </div>`;
+}
+function renderS6Round(t, ri){
+  const SEC=[180,120,60][ri];
+  return `<div class="timer-card" style="margin-top:8px">
+    <div class="timer-display" id="s6-timer">${pad(Math.floor(SEC/60))}:${pad(SEC%60)}</div>
+    <div class="timer-label">Round ${ri+1} ・ 4コマを見ながら中国語で説明</div>
+    <div class="row" style="justify-content:center">
+      <button class="btn btn-red" id="s6-start" onclick="s6Start(${ri})">🎤 スタート</button>
+      <button class="btn btn-ghost" id="s6-stop" onclick="s6Stop(${ri})" disabled>■ 停止して提出</button>
+    </div>
+  </div>
+  <div style="margin-top:14px">
+    <label style="font-size:12px;color:var(--text1);display:block;margin-bottom:5px">あなたの説明（自動認識、編集可）</label>
+    <textarea id="s6-text" class="live hz" style="resize:vertical;min-height:80px;width:100%"></textarea>
+  </div>
+  ${t.s6.rounds.slice(0,ri).map((r,i)=>r?renderS6RoundResult(r,i):'').join('')}`;
+}
+function pad(n){ return String(n).padStart(2,'0'); }
+function s6Start(ri){
+  if(recording) return;
+  const SEC=[180,120,60][ri];
+  const ok=startRec(live=>{ document.getElementById('s6-text').value=live; });
+  if(!ok) return;
+  document.getElementById('s6-start').disabled=true;
+  document.getElementById('s6-stop').disabled=false;
+  let remain=SEC; const disp=document.getElementById('s6-timer');
+  const tick=()=>{ disp.textContent=`${pad(Math.floor(remain/60))}:${pad(remain%60)}`; disp.classList.toggle('warn',remain<=10);
+    if(remain<=0){ clearInterval(timerHandle); s6Stop(ri); return; } remain--; };
+  tick(); timerHandle=setInterval(tick,1000);
+}
+async function s6Stop(ri){
+  if(timerHandle){ clearInterval(timerHandle); timerHandle=null; }
+  document.getElementById('s6-start').disabled=false;
+  document.getElementById('s6-stop').disabled=true;
+  recCb = async (final)=>{
+    const text=(final||document.getElementById('s6-text').value||'').trim();
+    if(!text){ toast('説明が空でした'); return; }
+    toast('Round '+(ri+1)+'を分析中…');
+    try{
+      const raw = await callClaude({
+        system:'出力はJSONのみ。',
+        messages:[{role:'user', content:
+`ユーザーは絵のイメージだけを見て、${[3,2,1][ri]}分間中国語で説明しました。タスク：
+- 冗長な表現を削減
+- 核心情報を抽出
+- 自然な中国語に改善
+
+発話：${text}
+
+JSONのみ：{"compressed":"短く圧縮した版(中国語)", "drop":["削れる箇所2〜4個(中国語)"], "keep":["残すべき核心2〜4個(中国語)"], "advice":"日本語の一言アドバイス（次のラウンドで意識すべきこと）"}`
+        }], max_tokens: 1200
+      });
+      const r = parseJson(raw); r.transcript=text;
+      const t=cur(); t.s6.rounds[ri]=r; persist(); renderS6(t);
+    }catch(e){ toast('分析エラー: '+e.message); }
+  };
+  stopRec();
+}
+function renderS6RoundResult(r, i){
+  return `<div class="fb-section" style="margin-top:12px"><h5>Round ${i+1} の分析 ・ ${[3,2,1][i]}分</h5>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:6px">あなたの発話：</div>
+    <div class="hz" style="font-size:13px;line-height:1.7;color:var(--text1);background:var(--bg3);border-radius:6px;padding:8px 10px;margin-bottom:10px">${esc(r.transcript||'')}</div>
+    <div style="font-size:12px;color:var(--gold);margin-bottom:4px">✓ 圧縮版：</div>
+    <div class="hz" style="font-size:14px;line-height:1.8;margin-bottom:10px">${esc(r.compressed||'')}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><div style="font-size:11px;color:var(--red2)">削れる:</div><ul class="fb-list hz" style="font-size:13px">${(r.drop||[]).map(x=>`<li>− ${esc(x)}</li>`).join('')}</ul></div>
+      <div><div style="font-size:11px;color:var(--teal2)">残す核心:</div><ul class="fb-list hz" style="font-size:13px">${(r.keep||[]).map(x=>`<li>＋ ${esc(x)}</li>`).join('')}</ul></div>
+    </div>
+    <div style="font-size:12px;color:var(--text1);line-height:1.6">💡 ${esc(r.advice||'')}</div>
+  </div>`;
+}
+function renderS6Done(t){
+  return `<div class="fb-section" style="margin-top:8px"><h5>🎉 321 リテリング完了</h5>
+    <div style="font-size:13px;color:var(--text1);line-height:1.7">3→2→1分の圧縮を通じて、冗長な部分が削られ、核心が研ぎ澄まされました。<br>各ラウンドの分析を見比べると、自分が無意識に多用する表現も見つかります。</div></div>
+    ${t.s6.rounds.map((r,i)=>r?renderS6RoundResult(r,i):'').join('')}
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-ghost" onclick="if(confirm('もう一度やり直しますか？')){cur().s6.rounds=[null,null,null];persist();renderS6(cur());}">🔄 もう一度</button>
+      <button class="btn btn-red" onclick="goStep(7)">次へ：STEP 7 ロールプレイ →</button>
+    </div>`;
+}
+
+// ════════ STEP 7: roleplay ════════
+function renderS7(t){
+  const stage=document.getElementById('stage');
+  stage.innerHTML = `<div class="wrap">
+    <div class="card">
+      <h3>STEP 7 ・ 実戦ロールプレイ（全部 中国語）</h3>
+      <div class="sub">Claudeが場面の相手役を演じます。全部中国語、あなたのレベルに自動調整、軽い修正は途中で行わず、最後にまとめてフィードバック。</div>
+      <div class="field" style="margin-bottom:10px">
+        <label style="font-size:12px;color:var(--text1);display:block;margin-bottom:5px">場面設定（中国語または日本語）</label>
+        <input id="s7-setting" placeholder="例：在朋友家聊「${esc(t.name)}」/ レストランで注文 / 旅行の道案内 …" value="${esc(t.s7.setting||'')}" style="width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:8px;color:var(--text0);font-family:inherit;font-size:14px;padding:10px 13px;outline:none" />
+      </div>
+      <div class="row">
+        <button class="btn btn-red" onclick="s7Start()" ${t.s7.messages.length?'disabled':''}>${t.s7.messages.length?'進行中':'▶ 開始（相手役と話す）'}</button>
+        ${t.s7.messages.length?`<button class="btn btn-gold" onclick="s7Feedback()">🏁 終了してフィードバック</button>
+          <button class="btn btn-ghost" onclick="if(confirm('会話を最初からやり直しますか？')){cur().s7={setting:cur().s7.setting,messages:[],feedback:null};persist();renderS7(cur());}">最初から</button>`:''}
+      </div>
+    </div>
+    ${t.s7.messages.length?`<div class="card">
+      <h3>💬 ロールプレイ中…</h3>
+      <div class="chat" id="s7-chat">${t.s7.messages.map(m=>`<div class="msg ${m.role}"><div class="av">${m.role==='ai'?'伙':'你'}</div><div class="bub zh">${esc(m.text).replace(/\n/g,'<br>')}</div></div>`).join('')}</div>
+      <div class="input-row">
+        <textarea id="s7-input" class="hz" placeholder="用中文回答…"></textarea>
+        <button class="btn btn-rec" id="s7-mic" onclick="s7Mic()">🎤</button>
+        <button class="btn btn-red" onclick="s7Send()">发送</button>
+      </div>
+    </div>`:''}
+    ${t.s7.feedback?renderS7Feedback(t.s7.feedback):''}
+  </div>`;
+  document.getElementById('s7-setting')?.addEventListener('input', e=>{ cur().s7.setting=e.target.value; persist(); });
+  document.getElementById('s7-input')?.addEventListener('keydown', e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); s7Send(); }});
+}
+async function s7Start(){
+  const t=cur(); const setting=(document.getElementById('s7-setting').value||t.s7.setting||`聊一聊「${t.name}」`).trim();
+  t.s7.setting=setting; persist();
+  const sys = `你是中文口语角色扮演伙伴。场景：${setting}。
+规则：
+- 全程使用简体中文，绝不夹杂日语或英语。
+- 句子简短自然，每次回复1-2句。
+- 根据用户的水平自动调整难度（如果用户用简单的句子，你也保持简单）。
+- 自然反问让对话继续。
+- 不要解释或翻译，专注扮演角色。
+现在自然地开场。`;
+  try{
+    const r = await callClaude({ system: sys, messages:[{role:'user', content:'(开始)'}], max_tokens:200 });
+    t.s7.messages.push({role:'ai', text:r}); persist(); renderS7(t);
+    speak(r);
+  }catch(e){ toast('開始エラー: '+e.message); }
+}
+async function s7Send(){
+  const t=cur(); const input=document.getElementById('s7-input'); const txt=input.value.trim();
+  if(!txt) return;
+  t.s7.messages.push({role:'user', text:txt}); input.value=''; persist();
+  const chat=document.getElementById('s7-chat');
+  chat.insertAdjacentHTML('beforeend', `<div class="msg user"><div class="av">你</div><div class="bub zh">${esc(txt)}</div></div>`);
+  chat.insertAdjacentHTML('beforeend', `<div class="msg ai" id="s7-think"><div class="av">伙</div><div class="bub"><span class="loading">…</span></div></div>`);
+  chat.scrollTop=chat.scrollHeight;
+  try{
+    const sys = `你是中文口语角色扮演伙伴。场景：${t.s7.setting}。
+规则：全程中文，1-2句，自然反问，根据用户水平调整难度，不解释不翻译，专注扮演角色。`;
+    const msgs = t.s7.messages.map(m=>({role:m.role==='ai'?'assistant':'user', content:m.text}));
+    const r = await callClaude({ system:sys, messages: msgs, max_tokens:220 });
+    t.s7.messages.push({role:'ai', text:r}); persist();
+    document.getElementById('s7-think')?.remove();
+    chat.insertAdjacentHTML('beforeend', `<div class="msg ai"><div class="av">伙</div><div class="bub zh">${esc(r).replace(/\n/g,'<br>')}</div></div>`);
+    chat.scrollTop=chat.scrollHeight;
+    speak(r);
+  }catch(e){ document.getElementById('s7-think')?.remove(); toast('返信エラー: '+e.message); }
+}
+function s7Mic(){
+  const btn=document.getElementById('s7-mic');
+  if(recording){ recCb=(final)=>{ document.getElementById('s7-input').value=final; btn.classList.remove('recording'); }; stopRec(); return; }
+  const ok = startRec(live=>{ document.getElementById('s7-input').value=live; });
+  if(ok){ btn.classList.add('recording'); }
+}
+async function s7Feedback(){
+  const t=cur();
+  toast('フィードバックを生成中…');
+  try{
+    const raw = await callClaude({
+      system:'出力はJSONのみ。',
+      messages:[{role:'user', content:
+`次の中国語ロールプレイ会話を踏まえて、ユーザーへのフィードバックを日本語で書いてください（評価対象はユーザー＝你の発話のみ）。
+場面：${t.s7.setting}
+会話：
+${t.s7.messages.map(m=>(m.role==='user'?'你':'伙伴')+'：'+m.text).join('\n')}
+
+JSONのみ：{
+  "good": ["良かった点（日本語）1〜3個"],
+  "improve": [ {"orig":"ユーザーの間違った中国語", "fix":"修正", "why":"日本語の説明"} ],
+  "rewrite": [ {"orig":"ユーザーの中国語", "natural":"より自然な言い換え（中国語）"} ],
+  "nextVocab": [ {"zh":"中国語", "py":"拼音", "ja":"日本語"} ]
+}`
+      }], max_tokens: 1800
+    });
+    const fb = parseJson(raw);
+    t.s7.feedback = fb; persist(); renderS7(t);
+    toast('フィードバック完成 ✓');
+  }catch(e){ toast('フィードバックエラー: '+e.message); }
+}
+function renderS7Feedback(f){
+  return `<div class="card">
+    <h3>🏁 ロールプレイ フィードバック</h3>
+    <div class="fb-section"><h5>✓ 良かった点</h5><ul class="fb-list">${(f.good||[]).map(x=>`<li>・ ${esc(x)}</li>`).join('')}</ul></div>
+    <div class="fb-section"><h5>📝 改善表現</h5>${(f.improve||[]).map(x=>`<div class="fb-row"><span class="orig">${esc(x.orig||'')}</span> → <span class="fix">${esc(x.fix||'')}</span><div class="why">${esc(x.why||'')}</div></div>`).join('')||'<div style="font-size:12px;color:var(--text2)">特になし</div>'}</div>
+    <div class="fb-section"><h5>⭐ 自然な言い換え</h5>${(f.rewrite||[]).map(x=>`<div class="fb-row"><span style="color:var(--text2);font-family:'Noto Sans SC'">${esc(x.orig||'')}</span><div style="margin-top:3px"><span class="fix">→ ${esc(x.natural||'')}</span> <button class="btn btn-ghost btn-sm" style="padding:2px 7px" onclick="speak(${aq(x.natural||'')})">🔊</button></div></div>`).join('')||'<div style="font-size:12px;color:var(--text2)">特になし</div>'}</div>
+    <div class="fb-section"><h5>📇 次に覚える語彙</h5>
+      <div style="overflow-x:auto"><table class="vt"><thead><tr><th>中国語</th><th>拼音</th><th>日本語</th></tr></thead><tbody>${(f.nextVocab||[]).map(v=>`<tr><td class="zh">${esc(v.zh||'')}</td><td class="py">${esc(v.py||'')}</td><td>${esc(v.ja||'')}</td></tr>`).join('')}</tbody></table></div>
+      ${f.nextVocab?.length?`<button class="btn btn-teal btn-sm" style="margin-top:10px" onclick="s7ToFlashcards()">📇 フラッシュカードに追加</button>`:''}
+    </div>
+    <div class="row"><button class="btn btn-ghost" onclick="goStep(1)">🔄 次の週のトピックへ（STEP 1）</button></div>
+  </div>`;
+}
+function s7ToFlashcards(){
+  const t=cur(); const v=t.s7.feedback.nextVocab||[]; if(!v.length) return;
+  let decks = JSON.parse(localStorage.getItem('fc_decks')||'null') || [];
+  // try to find an existing deck for this topic
+  const wanted = `Week${t.week} ${t.name} / コーチ`;
+  let deck = decks.find(d=>d.name===wanted);
+  if(!deck){ deck = { id:'d'+Date.now(), name:wanted, lang:'zh-CN', cards:[] }; decks.push(deck); }
+  v.forEach(w=>{ deck.cards.push({ id:'c'+Date.now()+Math.random().toString(36).slice(2,6), front:w.zh, mean:((w.py?w.py+' / ':'')+(w.ja||'')).trim(), ex:'', box:0,due:0,reps:0 }); });
+  localStorage.setItem('fc_decks', JSON.stringify(decks));
+  toast(`${v.length} 語を「${deck.name}」に追加しました ✓`);
+}
+
+// ════════ MODALS / TOPIC MGMT ════════
+function openKeyModal(){ document.getElementById('key-input').value=apiKey; document.getElementById('key-modal').classList.add('show'); }
+function closeKeyModal(){ document.getElementById('key-modal').classList.remove('show'); }
+function saveKey(){ apiKey=document.getElementById('key-input').value.trim(); localStorage.setItem('coach_key',apiKey); localStorage.setItem('zh_key',apiKey); closeKeyModal(); renderSteps(); renderStage(); toast(apiKey?'キーを保存しました':'キーを削除しました'); }
+function openNewTopic(){ document.getElementById('nt-name').value=''; document.getElementById('nt-week').value=topics.length+1; document.getElementById('new-modal').classList.add('show'); setTimeout(()=>document.getElementById('nt-name').focus(),50); }
+function closeNewTopic(){ document.getElementById('new-modal').classList.remove('show'); }
+function createTopic(){
+  const name=document.getElementById('nt-name').value.trim();
+  const week=parseInt(document.getElementById('nt-week').value)||(topics.length+1);
+  if(!name){ toast('トピック名を入力してください'); return; }
+  const t=blankTopic(name,week); topics.push(t); curId=t.id; curStep=1; persist();
+  closeNewTopic(); renderTopicSel(); renderSteps(); renderStage();
+  toast(`Week ${week} ${name} を作成しました ✓`);
+}
+
+// init
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged=()=>{}; }
+renderTopicSel(); renderSteps(); renderStage();
+</script>
+</body>
+</html>
