@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フラッシュカード・メーカー</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root{
+  --bg0:#0b0c10; --bg1:#13151b; --bg2:#1b1e26; --bg3:#262a35; --bg4:#333845;
+  --line:rgba(255,255,255,0.07); --line2:rgba(255,255,255,0.13);
+  --text0:#f1f3f7; --text1:#a3a9b8; --text2:#5c6273;
+  --teal:#34c5a8; --teal2:#5fe3c6; --teal-bg:rgba(52,197,168,0.12);
+  --amber:#e8a93c; --amber2:#f5c66e; --amber-bg:rgba(232,169,60,0.12);
+  --rose:#e8627d; --rose-bg:rgba(232,98,125,0.12);
+  --indigo:#7c8cf5; --indigo-bg:rgba(124,140,245,0.12);
+  --r:10px; --r2:14px;
+}
+body{ background:var(--bg0); color:var(--text0); font-family:'Inter','Noto Sans SC',sans-serif; font-size:14px; height:100vh; overflow:hidden; }
+button{ font-family:inherit; }
+::-webkit-scrollbar{ width:5px; height:5px; }
+::-webkit-scrollbar-thumb{ background:var(--bg3); border-radius:99px; }
+.app{ display:grid; grid-template-rows:56px 1fr; height:100vh; }
+
+.topbar{ background:var(--bg1); border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 18px; gap:16px; }
+.logo{ font-family:'Syne'; font-weight:800; font-size:16px; color:var(--teal2); letter-spacing:-0.02em; white-space:nowrap; }
+.logo em{ color:var(--text1); font-style:normal; font-weight:400; font-size:11px; margin-left:8px; }
+.tabs{ flex:1; display:flex; justify-content:center; gap:5px; flex-wrap:wrap; }
+.tab{ display:flex; align-items:center; gap:6px; padding:7px 15px; border-radius:100px; cursor:pointer; font-size:13px; color:var(--text2); font-weight:500; transition:all .15s; border:1px solid transparent; }
+.tab:hover{ color:var(--text1); }
+.tab.active{ background:var(--teal-bg); color:var(--teal2); border-color:rgba(52,197,168,0.28); }
+.langlinks{ display:flex; gap:10px; }
+.langlink{ font-size:11px; color:var(--text2); text-decoration:none; white-space:nowrap; }
+.langlink:hover{ color:var(--text1); }
+
+.body{ display:grid; grid-template-columns:248px 1fr; overflow:hidden; }
+.panel{ background:var(--bg1); display:flex; flex-direction:column; overflow:hidden; }
+.left{ border-right:1px solid var(--line); }
+.psec{ padding:14px 16px; border-bottom:1px solid var(--line); }
+.plabel{ font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text2); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.scrolly{ overflow-y:auto; flex:1; }
+.deck-card{ background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:11px 12px; margin-bottom:8px; cursor:pointer; transition:all .15s; position:relative; }
+.deck-card:hover{ border-color:var(--line2); background:var(--bg3); }
+.deck-card.active{ border-color:var(--teal); background:var(--teal-bg); }
+.deck-card .d-title{ font-size:13px; font-weight:600; margin-bottom:3px; padding-right:18px; }
+.deck-card .d-sub{ font-size:11px; color:var(--text2); }
+.deck-card.active .d-sub{ color:rgba(95,227,198,.85); }
+.deck-card .d-del{ position:absolute; top:8px; right:9px; background:none; border:none; color:var(--text2); font-size:14px; cursor:pointer; line-height:1; opacity:0; }
+.deck-card:hover .d-del{ opacity:1; }
+.deck-card .d-del:hover{ color:var(--rose); }
+.mini-stat{ display:flex; gap:8px; margin-top:8px; }
+.mini-stat .ms{ flex:1; background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:8px; text-align:center; }
+.mini-stat .ms .n{ font-family:'Syne'; font-size:18px; font-weight:700; }
+.mini-stat .ms .l{ font-size:9.5px; color:var(--text2); margin-top:1px; }
+
+.center{ display:flex; flex-direction:column; overflow:hidden; }
+.chead{ padding:15px 24px; border-bottom:1px solid var(--line); background:var(--bg1); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.chead h2{ font-family:'Syne'; font-size:17px; font-weight:700; }
+.chead p{ font-size:12px; color:var(--text1); margin-top:3px; }
+.stage{ flex:1; overflow-y:auto; padding:24px; }
+
+.btn{ border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+.btn-teal{ background:var(--teal); color:#04211b; }
+.btn-teal:hover{ background:var(--teal2); }
+.btn-amber{ background:var(--amber); color:#241701; }
+.btn-amber:hover{ background:var(--amber2); }
+.btn-rose{ background:var(--rose-bg); color:var(--rose); border:1px solid rgba(232,98,125,.3); }
+.btn-rose:hover{ background:rgba(232,98,125,.22); }
+.btn-indigo{ background:var(--indigo-bg); color:var(--indigo); border:1px solid rgba(124,140,245,.3); }
+.btn-indigo:hover{ background:rgba(124,140,245,.22); }
+.btn-ghost{ background:var(--bg3); color:var(--text1); border:1px solid var(--line2); }
+.btn-ghost:hover{ border-color:var(--teal); color:var(--teal2); }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+.btn-sm{ padding:6px 11px; font-size:12px; }
+
+/* ---------- STUDY ---------- */
+.study-wrap{ max-width:640px; margin:0 auto; }
+.study-bar{ display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+.progress{ flex:1; height:7px; background:var(--bg3); border-radius:99px; overflow:hidden; }
+.progress > div{ height:100%; background:linear-gradient(90deg,var(--teal),var(--teal2)); width:0; transition:width .3s; }
+.progress-txt{ font-size:12px; color:var(--text1); white-space:nowrap; font-family:'Syne'; font-weight:600; }
+.fc{ perspective:1600px; height:330px; margin-bottom:18px; cursor:pointer; }
+.fc-inner{ position:relative; width:100%; height:100%; transition:transform .5s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d; }
+.fc.flipped .fc-inner{ transform:rotateY(180deg); }
+.fc-face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:18px; padding:30px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.fc-front{ background:linear-gradient(160deg,var(--bg2),var(--bg1)); border:1px solid var(--line2); }
+.fc-back{ background:linear-gradient(160deg,#16241f,#13191b); border:1px solid rgba(52,197,168,.3); transform:rotateY(180deg); overflow-y:auto; }
+.fc-tag{ font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text2); margin-bottom:16px; }
+.fc-front .word{ font-size:38px; font-weight:700; line-height:1.25; font-family:'Syne'; word-break:break-word; }
+.fc-front .word.cjk{ font-family:'Noto Sans SC'; font-weight:500; }
+.fc-hint{ position:absolute; bottom:16px; left:0; right:0; font-size:11px; color:var(--text2); }
+.fc-back .b-mean{ font-size:22px; font-weight:600; line-height:1.5; margin-bottom:16px; word-break:break-word; }
+.fc-back .b-ex{ font-size:15px; color:var(--text1); line-height:1.7; border-top:1px solid var(--line); padding-top:14px; max-width:480px; white-space:pre-wrap; word-break:break-word; }
+.fc-box{ position:absolute; top:14px; right:16px; font-size:10px; color:var(--text2); background:var(--bg3); border:1px solid var(--line); border-radius:99px; padding:2px 9px; }
+.fc-speak{ position:absolute; top:12px; left:14px; background:var(--bg3); border:1px solid var(--line2); color:var(--text1); border-radius:8px; width:32px; height:32px; cursor:pointer; font-size:14px; }
+.fc-speak:hover{ border-color:var(--teal); color:var(--teal2); }
+.study-actions{ display:flex; gap:10px; }
+.study-actions .btn{ flex:1; justify-content:center; padding:13px; font-size:14px; }
+.study-foot{ display:flex; justify-content:center; gap:8px; margin-top:14px; }
+.empty{ text-align:center; padding:60px 20px; color:var(--text2); }
+.empty .big{ font-size:48px; margin-bottom:14px; }
+.empty p{ font-size:14px; line-height:1.8; margin-bottom:6px; }
+.done-card{ text-align:center; padding:50px 24px; background:var(--bg1); border:1px solid var(--line); border-radius:var(--r2); }
+.done-card .big{ font-size:54px; margin-bottom:14px; }
+.done-card h3{ font-family:'Syne'; font-size:22px; margin-bottom:8px; }
+.done-card p{ color:var(--text1); margin-bottom:20px; line-height:1.7; }
+
+/* ---------- IMPORT ---------- */
+.io-wrap{ max-width:820px; margin:0 auto; }
+.io-card{ background:var(--bg1); border:1px solid var(--line); border-radius:var(--r2); padding:20px 22px; margin-bottom:18px; }
+.io-card h3{ font-family:'Syne'; font-size:15px; color:var(--teal2); margin-bottom:4px; }
+.io-card .sub{ font-size:12px; color:var(--text2); margin-bottom:14px; line-height:1.6; }
+.io-card .sub code{ background:var(--bg3); border-radius:4px; padding:1px 6px; color:var(--amber2); font-size:11px; }
+textarea.paste{ width:100%; min-height:150px; background:var(--bg2); border:1px solid var(--line2); border-radius:10px; color:var(--text0); font-family:'Menlo','Consolas','Noto Sans SC',monospace; font-size:13px; padding:13px; outline:none; resize:vertical; line-height:1.7; }
+textarea.paste:focus{ border-color:var(--teal); }
+.io-controls{ display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; margin:14px 0; }
+.io-field{ display:flex; flex-direction:column; gap:5px; }
+.io-field label{ font-size:11px; color:var(--text1); }
+.io-field select, .io-field input{ background:var(--bg2); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:inherit; font-size:13px; padding:8px 11px; outline:none; }
+.io-field select:focus, .io-field input:focus{ border-color:var(--teal); }
+.chk{ display:flex; align-items:center; gap:7px; font-size:13px; color:var(--text1); cursor:pointer; padding-bottom:8px; }
+.chk input{ width:16px; height:16px; accent-color:var(--teal); }
+.file-drop{ border:1.5px dashed var(--line2); border-radius:12px; padding:26px; text-align:center; cursor:pointer; transition:all .15s; }
+.file-drop:hover, .file-drop.drag{ border-color:var(--teal); background:var(--teal-bg); }
+.file-drop .fi{ font-size:30px; margin-bottom:8px; }
+.file-drop p{ font-size:13px; color:var(--text1); }
+.file-drop .sub2{ font-size:11px; color:var(--text2); margin-top:4px; }
+
+.preview-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px; }
+.preview-table th{ background:var(--bg3); padding:7px 10px; text-align:left; border:1px solid var(--line); font-weight:600; }
+.preview-table th select{ width:100%; background:var(--bg2); border:1px solid var(--line2); border-radius:6px; color:var(--text0); font-size:12px; padding:4px 6px; outline:none; cursor:pointer; }
+.preview-table td{ padding:6px 10px; border:1px solid var(--line); color:var(--text1); max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.preview-table tr:nth-child(even) td{ background:rgba(255,255,255,.02); }
+.col-front{ color:var(--teal2) !important; }
+.col-mean{ color:var(--amber2) !important; }
+.col-ex{ color:var(--indigo) !important; }
+.col-skip{ opacity:.4; }
+.pv-note{ font-size:12px; color:var(--text1); margin:12px 0; display:flex; gap:16px; flex-wrap:wrap; }
+.pv-note b{ font-family:'Syne'; }
+.legend{ display:inline-flex; align-items:center; gap:5px; }
+.dot{ width:9px; height:9px; border-radius:3px; display:inline-block; }
+
+/* ---------- LIST ---------- */
+.list-tools{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+.search{ flex:1; min-width:180px; background:var(--bg2); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:inherit; font-size:13px; padding:9px 13px; outline:none; }
+.search:focus{ border-color:var(--teal); }
+.row-card{ background:var(--bg1); border:1px solid var(--line); border-radius:var(--r); padding:13px 16px; margin-bottom:8px; display:grid; grid-template-columns:1fr 1.4fr auto; gap:16px; align-items:center; }
+.row-card .rc-front{ font-weight:600; font-size:15px; word-break:break-word; }
+.row-card .rc-front.cjk{ font-family:'Noto Sans SC'; }
+.row-card .rc-back .m{ font-size:13.5px; color:var(--text0); }
+.row-card .rc-back .e{ font-size:12px; color:var(--text2); margin-top:3px; line-height:1.5; white-space:pre-wrap; }
+.row-card .rc-acts{ display:flex; gap:6px; }
+.icon-btn{ background:var(--bg3); border:1px solid var(--line2); color:var(--text1); border-radius:7px; width:32px; height:32px; cursor:pointer; font-size:13px; }
+.icon-btn:hover{ border-color:var(--teal); color:var(--teal2); }
+.icon-btn.del:hover{ border-color:var(--rose); color:var(--rose); }
+
+/* ---------- ADD ---------- */
+.add-wrap{ max-width:560px; margin:0 auto; }
+.field{ margin-bottom:13px; }
+.field label{ font-size:12px; color:var(--text1); display:block; margin-bottom:5px; }
+.field input, .field textarea, .field select{ width:100%; background:var(--bg2); border:1px solid var(--line2); border-radius:9px; color:var(--text0); font-family:'Inter','Noto Sans SC'; font-size:15px; padding:11px 13px; outline:none; }
+.field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--teal); }
+.field textarea{ resize:vertical; min-height:66px; line-height:1.6; }
+.field .hint{ font-size:11px; color:var(--text2); margin-top:4px; }
+
+.toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--line2); border-radius:8px; padding:10px 20px; font-size:13px; color:var(--teal2); z-index:400; box-shadow:0 8px 30px rgba(0,0,0,.5); }
+.modal-bg{ position:fixed; inset:0; background:rgba(11,12,16,.85); z-index:500; display:none; align-items:center; justify-content:center; }
+.modal-bg.show{ display:flex; }
+.modal{ background:var(--bg2); border:1px solid var(--line2); border-radius:16px; padding:26px; max-width:420px; width:90%; }
+.modal h3{ font-family:'Syne'; font-size:18px; color:var(--teal2); margin-bottom:14px; }
+.modal input, .modal select{ width:100%; background:var(--bg3); border:1px solid var(--line2); border-radius:8px; color:var(--text0); font-family:inherit; font-size:14px; padding:11px 13px; outline:none; margin-bottom:13px; }
+.modal input:focus, .modal select:focus{ border-color:var(--teal); }
+.modal-row{ display:flex; gap:8px; }
+.hide{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">⚡ Flashcards <em>スプレッドシート → 暗記カード</em></div>
+    <div class="tabs">
+      <div class="tab active" data-mode="study" onclick="setMode('study')">🎴 学習</div>
+      <div class="tab" data-mode="import" onclick="setMode('import')">📥 読み込み</div>
+      <div class="tab" data-mode="add" onclick="setMode('add')">➕ 追加</div>
+      <div class="tab" data-mode="list" onclick="setMode('list')">📋 一覧・編集</div>
+    </div>
+    <div class="langlinks">
+      <a class="langlink" href="index.html">EN版</a>
+      <a class="langlink" href="chinese.html">中文版</a>
+    </div>
+  </div>
+  <div class="body">
+    <div class="panel left">
+      <div class="psec">
+        <div class="plabel"><span>デッキ（単語帳）</span><button class="icon-btn" style="width:24px;height:24px;font-size:14px" onclick="openNewDeck()" title="新しいデッキ">＋</button></div>
+        <div id="deck-list"></div>
+      </div>
+      <div class="psec">
+        <div class="plabel">このデッキの状況</div>
+        <div class="mini-stat">
+          <div class="ms"><div class="n" id="st-total" style="color:var(--text0)">0</div><div class="l">総カード</div></div>
+          <div class="ms"><div class="n" id="st-due" style="color:var(--amber2)">0</div><div class="l">復習予定</div></div>
+          <div class="ms"><div class="n" id="st-learned" style="color:var(--teal2)">0</div><div class="l">習得</div></div>
+        </div>
+      </div>
+      <div class="scrolly"></div>
+    </div>
+    <div class="panel center">
+      <div class="chead">
+        <div><h2 id="chead-title">学習</h2><p id="chead-sub"></p></div>
+        <div id="chead-actions"></div>
+      </div>
+      <div class="stage" id="stage"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="deck-modal">
+  <div class="modal">
+    <h3 id="dm-title">新しいデッキ</h3>
+    <input id="dm-name" placeholder="デッキ名（例：英単語 / 中国語 HSK4 / 専門用語）" />
+    <select id="dm-lang">
+      <option value="">読み上げ言語：自動</option>
+      <option value="en-US">英語 (en-US)</option>
+      <option value="zh-CN">中国語 (zh-CN)</option>
+      <option value="ja-JP">日本語 (ja-JP)</option>
+      <option value="ko-KR">韓国語 (ko-KR)</option>
+      <option value="fr-FR">フランス語 (fr-FR)</option>
+      <option value="es-ES">スペイン語 (es-ES)</option>
+      <option value="de-DE">ドイツ語 (de-DE)</option>
+    </select>
+    <div class="modal-row">
+      <button class="btn btn-teal" style="flex:1" onclick="saveDeck()">保存</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeDeckModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════ STATE ════════════════
+let mode='study';
+let decks = load('fc_decks', null);
+let curDeckId = localStorage.getItem('fc_curdeck') || null;
+let editingDeckId = null;
+
+// Study session state
+let session = { queue:[], idx:0, flipped:false, onlyDue:true, finished:false };
+// Import parse state
+let parsed = { rows:[], headerRow:false, colMap:[] }; // colMap[i] in {front,mean,ex,skip}
+
+const SR_INTERVALS = [0, 1, 3, 7, 16, 40]; // days per Leitner box (box 0..5)
+
+function load(key, def){ try{ const v=JSON.parse(localStorage.getItem(key)); return v==null?def:v; }catch(_){ return def; } }
+function save(){ localStorage.setItem('fc_decks', JSON.stringify(decks)); if(curDeckId) localStorage.setItem('fc_curdeck', curDeckId); }
+
+// seed a starter deck on first run
+if(!decks){
+  decks = [{
+    id:'d'+Date.now(), name:'サンプル（英単語）', lang:'en-US',
+    cards:[
+      mkCard('meticulous','非常に注意深い、細部まで丁寧な','She is meticulous about keeping records.'),
+      mkCard('resilient','回復力のある、立ち直りが早い','Children are often remarkably resilient.'),
+      mkCard('ubiquitous','至る所に存在する','Smartphones are now ubiquitous.')
+    ]
+  }];
+  curDeckId = decks[0].id; save();
+}
+if(!curDeckId || !decks.find(d=>d.id===curDeckId)) curDeckId = decks[0]?.id || null;
+
+function mkCard(front, mean, ex){ return { id:'c'+Date.now()+Math.random().toString(36).slice(2,6), front:front||'', mean:mean||'', ex:ex||'', box:0, due:0, reps:0 }; }
+function curDeck(){ return decks.find(d=>d.id===curDeckId) || null; }
+
+// ════════════════ UTIL ════════════════
+const CJK=/[一-鿿぀-ゟ゠-ヿ가-힣]/;
+function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function aq(s){ return JSON.stringify(s==null?'':String(s)).replace(/"/g,'&quot;'); }
+function toast(msg){ const e=document.createElement('div'); e.className='toast'; e.textContent=msg; document.body.appendChild(e); setTimeout(()=>e.remove(),2300); }
+function now(){ return Date.now(); }
+function isDue(c){ return (c.due||0) <= now(); }
+function speak(text, lang){
+  if(!('speechSynthesis' in window)){ toast('このブラウザは読み上げ非対応です'); return; }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); if(lang) u.lang=lang; u.rate=.92;
+  if(lang){ const vs=speechSynthesis.getVoices(); const v=vs.find(x=>x.lang===lang)||vs.find(x=>x.lang.slice(0,2)===lang.slice(0,2)); if(v) u.voice=v; }
+  speechSynthesis.speak(u);
+}
+
+// ════════════════ CSV / TSV PARSER ════════════════
+function detectDelim(text){
+  const sample = text.split(/\r?\n/).slice(0,5).join('\n');
+  const tabs=(sample.match(/\t/g)||[]).length, commas=(sample.match(/,/g)||[]).length, semis=(sample.match(/;/g)||[]).length;
+  if(tabs>=commas && tabs>=semis && tabs>0) return '\t';
+  if(semis>commas) return ';';
+  return ',';
+}
+function parseTable(text, delim){
+  // robust parse supporting quoted fields w/ embedded delim & newlines
+  const rows=[]; let row=[], field='', i=0, inQ=false; const n=text.length;
+  while(i<n){
+    const ch=text[i];
+    if(inQ){
+      if(ch==='"'){ if(text[i+1]==='"'){ field+='"'; i+=2; continue; } inQ=false; i++; continue; }
+      field+=ch; i++; continue;
+    }
+    if(ch==='"'){ inQ=true; i++; continue; }
+    if(ch===delim){ row.push(field); field=''; i++; continue; }
+    if(ch==='\n'){ row.push(field); rows.push(row); row=[]; field=''; i++; continue; }
+    if(ch==='\r'){ i++; continue; }
+    field+=ch; i++;
+  }
+  if(field.length||row.length){ row.push(field); rows.push(row); }
+  // drop fully-empty rows
+  return rows.filter(r=>r.some(c=>String(c).trim()!==''));
+}
+
+// ════════════════ MODES ════════════════
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===m));
+  if(m==='study') renderStudy();
+  else if(m==='import') renderImport();
+  else if(m==='add') renderAdd();
+  else if(m==='list') renderList();
+}
+function renderSidebar(){
+  const list=document.getElementById('deck-list');
+  list.innerHTML = decks.map(d=>{
+    const total=d.cards.length, learned=d.cards.filter(c=>c.box>=3).length;
+    return `<div class="deck-card ${d.id===curDeckId?'active':''}" onclick="selectDeck('${d.id}')">
+      <button class="d-del" onclick="event.stopPropagation();deleteDeck('${d.id}')" title="削除">×</button>
+      <div class="d-title">${esc(d.name)}</div>
+      <div class="d-sub">${total} 枚 ・ 習得 ${learned}</div>
+    </div>`;
+  }).join('') || '<div style="font-size:12px;color:var(--text2)">デッキがありません</div>';
+  const d=curDeck();
+  document.getElementById('st-total').textContent = d?d.cards.length:0;
+  document.getElementById('st-due').textContent = d?d.cards.filter(isDue).length:0;
+  document.getElementById('st-learned').textContent = d?d.cards.filter(c=>c.box>=3).length:0;
+}
+function selectDeck(id){ curDeckId=id; save(); session.finished=false; renderSidebar(); setMode(mode); }
+
+// ─────────── STUDY ───────────
+function buildQueue(){
+  const d=curDeck(); if(!d){ session.queue=[]; return; }
+  let cards=d.cards.slice();
+  if(session.onlyDue){ const due=cards.filter(isDue); cards = due.length?due:cards; }
+  // due first, then by box asc, then shuffle within
+  cards.sort((a,b)=> (a.due||0)-(b.due||0) || (a.box||0)-(b.box||0));
+  // light shuffle so order isn't identical every time
+  for(let i=cards.length-1;i>0;i--){ if(Math.random()<0.5){ const j=Math.floor(Math.random()*(i+1)); [cards[i],cards[j]]=[cards[j],cards[i]]; } }
+  session.queue=cards; session.idx=0; session.flipped=false; session.finished=false;
+}
+function renderStudy(){
+  const d=curDeck();
+  document.getElementById('chead-title').textContent = d? '🎴 '+d.name : '学習';
+  document.getElementById('chead-sub').textContent = 'カードをクリックして裏返し、「覚えた／もう一度」で記録。間隔反復で出題されます。';
+  document.getElementById('chead-actions').innerHTML = d&&d.cards.length ? `
+    <label class="chk" style="padding:0;margin-right:6px"><input type="checkbox" id="only-due" ${session.onlyDue?'checked':''} onchange="toggleOnlyDue(this.checked)"> 復習予定のみ</label>
+    <button class="btn btn-ghost btn-sm" onclick="restartStudy()">🔄 やり直す</button>` : '';
+  renderSidebar();
+  if(!d){ document.getElementById('stage').innerHTML='<div class="empty"><div class="big">📚</div><p>左の「＋」からデッキを作るか、<br>「📥 読み込み」でスプレッドシートを取り込みましょう。</p></div>'; return; }
+  if(!d.cards.length){ document.getElementById('stage').innerHTML=`<div class="empty"><div class="big">🎴</div><p>このデッキにはまだカードがありません。</p><p style="margin-top:14px"><button class="btn btn-teal" onclick="setMode('import')">📥 スプレッドシートを読み込む</button> <button class="btn btn-ghost" onclick="setMode('add')">➕ 1件追加</button></p></div>`; return; }
+  if(!session.queue.length || session.finished===null) buildQueue();
+  renderCard();
+}
+function toggleOnlyDue(v){ session.onlyDue=v; buildQueue(); renderCard(); }
+function restartStudy(){ buildQueue(); renderCard(); }
+function renderCard(){
+  const stage=document.getElementById('stage'); const d=curDeck();
+  if(session.idx>=session.queue.length || session.finished){
+    const reviewed=session.queue.length;
+    stage.innerHTML=`<div class="study-wrap"><div class="done-card">
+      <div class="big">🎉</div><h3>セッション完了！</h3>
+      <p>${reviewed} 枚を学習しました。<br>復習予定が来たらまた出題されます。</p>
+      <button class="btn btn-teal" onclick="restartStudy()">🔄 もう一周する</button>
+      <button class="btn btn-ghost" onclick="setMode('add')">➕ 単語を追加</button>
+    </div></div>`;
+    renderSidebar(); return;
+  }
+  const c=session.queue[session.idx];
+  const cjk = CJK.test(c.front);
+  const pct = Math.round(session.idx/session.queue.length*100);
+  stage.innerHTML=`<div class="study-wrap">
+    <div class="study-bar">
+      <div class="progress"><div style="width:${pct}%"></div></div>
+      <div class="progress-txt">${session.idx+1} / ${session.queue.length}</div>
+    </div>
+    <div class="fc ${session.flipped?'flipped':''}" id="fc" onclick="flipCard()">
+      <div class="fc-inner">
+        <div class="fc-face fc-front">
+          <button class="fc-speak" onclick="event.stopPropagation();speak(${aq(c.front)}, ${aq(curDeck().lang||'')})">🔊</button>
+          <div class="fc-box">Box ${c.box}</div>
+          <div class="fc-tag">単語・表（おもて）</div>
+          <div class="word ${cjk?'cjk':''}">${esc(c.front)}</div>
+          <div class="fc-hint">クリックで意味を表示 ↻</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-tag">意味・例文（うら）</div>
+          <div class="b-mean">${esc(c.mean)||'<span style=\"color:var(--text2)\">（意味未登録）</span>'}</div>
+          ${c.ex?`<div class="b-ex">${esc(c.ex)}</div>`:''}
+        </div>
+      </div>
+    </div>
+    ${session.flipped ? `
+      <div class="study-actions">
+        <button class="btn btn-rose" onclick="grade(false)">↻ もう一度</button>
+        <button class="btn btn-teal" onclick="grade(true)">✓ 覚えた</button>
+      </div>` : `
+      <div class="study-actions">
+        <button class="btn btn-teal" onclick="flipCard()">めくる（答えを見る）</button>
+      </div>`}
+    <div class="study-foot">
+      <button class="btn btn-ghost btn-sm" onclick="editCardPrompt('${c.id}')">✎ 編集</button>
+      <button class="btn btn-ghost btn-sm" onclick="skipCard()">スキップ →</button>
+    </div>
+  </div>`;
+  renderSidebar();
+}
+function flipCard(){ session.flipped=!session.flipped; document.getElementById('fc').classList.toggle('flipped');
+  // re-render action buttons when flipped
+  renderCard(); }
+function skipCard(){ session.flipped=false; session.idx++; renderCard(); }
+function grade(known){
+  const c=session.queue[session.idx]; const real=curDeck().cards.find(x=>x.id===c.id); if(!real){ skipCard(); return; }
+  if(known){ real.box=Math.min(5,(real.box||0)+1); } else { real.box=Math.max(0,(real.box||0)-1); }
+  real.reps=(real.reps||0)+1;
+  real.due = now() + SR_INTERVALS[real.box]*86400000;
+  save(); session.flipped=false; session.idx++; renderCard();
+}
+
+// ─────────── IMPORT ───────────
+function renderImport(){
+  document.getElementById('chead-title').textContent='📥 スプレッドシートを読み込み';
+  document.getElementById('chead-sub').textContent='Excel / Googleスプレッドシートのセルをコピペ、またはCSV/TSVファイルを取り込みます。';
+  document.getElementById('chead-actions').innerHTML='';
+  renderSidebar();
+  document.getElementById('stage').innerHTML=`<div class="io-wrap">
+    <div class="io-card">
+      <h3>① データを入力</h3>
+      <div class="sub">スプレッドシートで範囲を選んで<code>コピー</code>→下の枠に<code>貼り付け</code>。1列目＝<b style="color:var(--teal2)">単語</b>、2列目＝<b style="color:var(--amber2)">意味</b>、（3列目＝<b style="color:var(--indigo)">例文</b>）が基本ですが、後で列を自由に割り当てできます。</div>
+      <textarea class="paste" id="paste-area" placeholder="ここに貼り付け。例：&#10;apple&#9;りんご&#9;I ate an apple.&#10;dog&#9;犬&#9;The dog is cute.&#10;&#10;（カンマ区切りCSVもOK）"></textarea>
+      <div class="io-controls">
+        <div class="io-field"><label>区切り文字</label>
+          <select id="delim-sel" onchange="doParse()">
+            <option value="auto">自動判定</option>
+            <option value="\t">タブ（スプレッドシートのコピペ）</option>
+            <option value=",">カンマ , （CSV）</option>
+            <option value=";">セミコロン ;</option>
+          </select>
+        </div>
+        <label class="chk"><input type="checkbox" id="header-chk" onchange="doParse()"> 1行目は見出し（ヘッダー）</label>
+        <button class="btn btn-ghost btn-sm" onclick="doParse()">↻ プレビュー更新</button>
+      </div>
+      <div class="file-drop" id="file-drop" onclick="document.getElementById('file-input').click()">
+        <div class="fi">📄</div>
+        <p>または CSV / TSV / TXT ファイルをドロップ・クリックして選択</p>
+        <div class="sub2">.csv / .tsv / .txt に対応</div>
+      </div>
+      <input type="file" id="file-input" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain" class="hide" />
+    </div>
+    <div class="io-card" id="preview-card" style="display:none">
+      <h3>② 列を割り当て & 確認</h3>
+      <div class="sub">各列の見出しで「単語／意味／例文／無視」を選べます。意味と例文は<b>裏面にまとめて</b>表示されます。</div>
+      <div class="pv-note">
+        <span class="legend"><span class="dot" style="background:var(--teal)"></span> 単語（表）</span>
+        <span class="legend"><span class="dot" style="background:var(--amber)"></span> 意味</span>
+        <span class="legend"><span class="dot" style="background:var(--indigo)"></span> 例文</span>
+        <span style="margin-left:auto">読み取り行数： <b id="pv-count">0</b></span>
+      </div>
+      <div style="overflow-x:auto"><table class="preview-table" id="pv-table"></table></div>
+      <div class="io-controls" style="margin-top:16px">
+        <div class="io-field"><label>取り込み先デッキ</label>
+          <select id="target-deck"></select>
+        </div>
+        <label class="chk"><input type="checkbox" id="replace-chk"> 既存カードを置き換える（チェックなしは追加）</label>
+        <button class="btn btn-teal" onclick="commitImport()">⬇ このデッキに取り込む</button>
+      </div>
+    </div>
+  </div>`;
+  // wire up file input + drag
+  const fi=document.getElementById('file-input'), fd=document.getElementById('file-drop');
+  fi.addEventListener('change', e=>{ const f=e.target.files[0]; if(f) readFile(f); });
+  ['dragenter','dragover'].forEach(ev=>fd.addEventListener(ev,e=>{ e.preventDefault(); fd.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=>fd.addEventListener(ev,e=>{ e.preventDefault(); fd.classList.remove('drag'); }));
+  fd.addEventListener('drop', e=>{ const f=e.dataTransfer.files[0]; if(f) readFile(f); });
+  document.getElementById('paste-area').addEventListener('input', ()=>{ clearTimeout(window._pt); window._pt=setTimeout(doParse,250); });
+}
+function readFile(f){
+  const name=f.name.toLowerCase();
+  const r=new FileReader();
+  r.onload=e=>{ document.getElementById('paste-area').value=e.target.result;
+    const sel=document.getElementById('delim-sel');
+    sel.value = name.endsWith('.tsv')?'\t':(name.endsWith('.csv')?',':'auto');
+    doParse(); toast('ファイルを読み込みました：'+f.name); };
+  r.readAsText(f);
+}
+function doParse(){
+  const text=document.getElementById('paste-area').value;
+  const card=document.getElementById('preview-card');
+  if(!text.trim()){ card.style.display='none'; return; }
+  let delim=document.getElementById('delim-sel').value;
+  if(delim==='auto'){ delim=detectDelim(text); }
+  let rows=parseTable(text, delim);
+  parsed.headerRow=document.getElementById('header-chk').checked;
+  // normalize column count
+  const maxCols=rows.reduce((m,r)=>Math.max(m,r.length),0);
+  rows=rows.map(r=>{ const a=r.map(x=>String(x).trim()); while(a.length<maxCols) a.push(''); return a; });
+  parsed.rows=rows;
+  // default column mapping: 0=front,1=mean,2=ex,rest=skip
+  parsed.colMap=[]; for(let i=0;i<maxCols;i++) parsed.colMap[i] = i===0?'front':i===1?'mean':i===2?'ex':'skip';
+  card.style.display='block';
+  // target deck options
+  const td=document.getElementById('target-deck');
+  td.innerHTML = decks.map(d=>`<option value="${d.id}" ${d.id===curDeckId?'selected':''}>${esc(d.name)}</option>`).join('')
+    + `<option value="__new__">＋ 新しいデッキを作成</option>`;
+  renderPreviewTable();
+}
+function setCol(i,val){ parsed.colMap[i]=val; renderPreviewTable(); }
+function renderPreviewTable(){
+  const t=document.getElementById('pv-table'); if(!t) return;
+  const rows=parsed.rows; const maxCols=parsed.colMap.length;
+  const dataRows = parsed.headerRow ? rows.slice(1) : rows;
+  const headerVals = parsed.headerRow ? rows[0] : null;
+  document.getElementById('pv-count').textContent = dataRows.filter(r=> r[parsed.colMap.indexOf('front')!=-1?parsed.colMap.indexOf('front'):0] ).length;
+  const opts=[['front','単語（表）'],['mean','意味'],['ex','例文'],['skip','無視']];
+  let head='<tr>';
+  for(let i=0;i<maxCols;i++){
+    head+=`<th><div style="font-size:10px;color:var(--text2);margin-bottom:4px">${headerVals?esc(headerVals[i]||('列'+(i+1))):('列 '+(i+1))}</div>
+      <select onchange="setCol(${i}, this.value)">${opts.map(o=>`<option value="${o[0]}" ${parsed.colMap[i]===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></th>`;
+  }
+  head+='</tr>';
+  const clsFor=v=> v==='front'?'col-front':v==='mean'?'col-mean':v==='ex'?'col-ex':'col-skip';
+  const body=dataRows.slice(0,12).map(r=>'<tr>'+r.map((c,i)=>`<td class="${clsFor(parsed.colMap[i])}">${esc(c)||'<span style=\"color:var(--text2)\">—</span>'}</td>`).join('')+'</tr>').join('');
+  const more = dataRows.length>12 ? `<tr><td colspan="${maxCols}" style="text-align:center;color:var(--text2)">… 他 ${dataRows.length-12} 行</td></tr>` : '';
+  t.innerHTML=head+body+more;
+}
+function commitImport(){
+  const dataRows = parsed.headerRow ? parsed.rows.slice(1) : parsed.rows;
+  const fi=parsed.colMap.indexOf('front');
+  const meanCols=parsed.colMap.map((v,i)=>v==='mean'?i:-1).filter(i=>i>=0);
+  const exCols=parsed.colMap.map((v,i)=>v==='ex'?i:-1).filter(i=>i>=0);
+  if(fi<0){ toast('「単語（表）」の列を1つ選んでください'); return; }
+  const newCards=[];
+  dataRows.forEach(r=>{
+    const front=(r[fi]||'').trim(); if(!front) return;
+    const mean=meanCols.map(i=>(r[i]||'').trim()).filter(Boolean).join(' / ');
+    const ex=exCols.map(i=>(r[i]||'').trim()).filter(Boolean).join('\n');
+    newCards.push(mkCard(front, mean, ex));
+  });
+  if(!newCards.length){ toast('取り込めるカードがありません'); return; }
+  let targetId=document.getElementById('target-deck').value;
+  if(targetId==='__new__'){
+    const nm=prompt('新しいデッキ名を入力してください', 'インポート '+new Date().toLocaleDateString('ja-JP'));
+    if(!nm) return;
+    const d={ id:'d'+Date.now(), name:nm.trim(), lang:'', cards:[] }; decks.push(d); targetId=d.id;
+  }
+  const deck=decks.find(d=>d.id===targetId);
+  if(document.getElementById('replace-chk').checked) deck.cards=[];
+  deck.cards=deck.cards.concat(newCards);
+  curDeckId=targetId; save();
+  toast(`${newCards.length} 枚のカードを「${deck.name}」に取り込みました ✓`);
+  document.getElementById('paste-area').value=''; document.getElementById('preview-card').style.display='none';
+  session.finished=false; buildQueue(); setMode('study');
+}
+
+// ─────────── ADD ───────────
+function renderAdd(){
+  const d=curDeck();
+  document.getElementById('chead-title').textContent='➕ 新しいカードを追加';
+  document.getElementById('chead-sub').textContent = d? `「${d.name}」に1件ずつ追加します。新しい単語が出てきたらすぐ登録できます。` : 'まずデッキを作成してください。';
+  document.getElementById('chead-actions').innerHTML='';
+  renderSidebar();
+  if(!d){ document.getElementById('stage').innerHTML='<div class="empty"><div class="big">📚</div><p>左の「＋」からデッキを作成してください。</p></div>'; return; }
+  document.getElementById('stage').innerHTML=`<div class="add-wrap">
+    <div class="field"><label>📌 単語（表・おもて）※必須</label>
+      <input id="ad-front" placeholder="例：apple / 苹果 / 重要な専門用語" />
+      <div class="hint">学習時にこの文字が表に表示されます。</div></div>
+    <div class="field"><label>💡 意味（うら）</label>
+      <input id="ad-mean" placeholder="例：りんご" /></div>
+    <div class="field"><label>📝 例文・メモ（うら・任意）</label>
+      <textarea id="ad-ex" placeholder="例：I ate an apple this morning."></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn btn-teal" onclick="addCard(false)">➕ 追加</button>
+      <button class="btn btn-ghost" onclick="addCard(true)">➕ 追加して続けて入力</button>
+    </div>
+    <div class="field" style="margin-top:20px;border-top:1px solid var(--line);padding-top:18px">
+      <label>このデッキの最近のカード（${d.cards.length} 枚）</label>
+      <div id="recent-list"></div>
+    </div>
+  </div>`;
+  document.getElementById('ad-front').focus();
+  renderRecent();
+}
+function renderRecent(){
+  const el=document.getElementById('recent-list'); if(!el) return; const d=curDeck();
+  const recent=d.cards.slice(-5).reverse();
+  el.innerHTML = recent.length? recent.map(c=>`<div class="row-card" style="grid-template-columns:1fr 1.4fr auto;padding:9px 12px;margin-bottom:6px">
+    <div class="rc-front ${CJK.test(c.front)?'cjk':''}" style="font-size:14px">${esc(c.front)}</div>
+    <div class="rc-back"><div class="m" style="font-size:12.5px">${esc(c.mean)}</div></div>
+    <button class="icon-btn del" onclick="deleteCard('${c.id}')">🗑</button>
+  </div>`).join('') : '<div style="font-size:12px;color:var(--text2)">まだありません</div>';
+}
+function addCard(again){
+  const d=curDeck(); const front=document.getElementById('ad-front').value.trim();
+  if(!front){ toast('単語を入力してください'); document.getElementById('ad-front').focus(); return; }
+  d.cards.push(mkCard(front, document.getElementById('ad-mean').value.trim(), document.getElementById('ad-ex').value.trim()));
+  save(); toast('カードを追加しました ✓'); buildQueue(); renderSidebar();
+  ['ad-front','ad-mean','ad-ex'].forEach(id=>document.getElementById(id).value='');
+  renderRecent();
+  if(again){ document.getElementById('ad-front').focus(); } else { document.getElementById('ad-front').focus(); }
+}
+
+// ─────────── LIST / EDIT ───────────
+let listFilter='';
+function renderList(){
+  const d=curDeck();
+  document.getElementById('chead-title').textContent='📋 一覧・編集';
+  document.getElementById('chead-sub').textContent = d?`「${d.name}」の全カード`:'デッキを選択してください';
+  document.getElementById('chead-actions').innerHTML = d&&d.cards.length?`<button class="btn btn-ghost btn-sm" onclick="exportCsv()">⬆ CSVで書き出し</button>`:'';
+  renderSidebar();
+  if(!d || !d.cards.length){ document.getElementById('stage').innerHTML='<div class="empty"><div class="big">📋</div><p>カードがありません。<br>「📥 読み込み」か「➕ 追加」から登録してください。</p></div>'; return; }
+  const q=listFilter.toLowerCase();
+  const cards=d.cards.filter(c=> !q || c.front.toLowerCase().includes(q) || c.mean.toLowerCase().includes(q) || (c.ex||'').toLowerCase().includes(q));
+  document.getElementById('stage').innerHTML=`<div class="io-wrap">
+    <div class="list-tools">
+      <input class="search" id="search-box" placeholder="🔍 単語・意味・例文で検索…" value="${esc(listFilter)}" oninput="listFilter=this.value;renderListRows()" />
+      <span style="font-size:12px;color:var(--text2)">${cards.length} / ${d.cards.length} 枚</span>
+    </div>
+    <div id="list-rows"></div>
+  </div>`;
+  renderListRows();
+  const sb=document.getElementById('search-box'); if(sb){ sb.focus(); sb.setSelectionRange(sb.value.length,sb.value.length); }
+}
+function renderListRows(){
+  const d=curDeck(); const q=listFilter.toLowerCase();
+  const cards=d.cards.filter(c=> !q || c.front.toLowerCase().includes(q) || c.mean.toLowerCase().includes(q) || (c.ex||'').toLowerCase().includes(q));
+  const el=document.getElementById('list-rows'); if(!el) return;
+  el.innerHTML = cards.map(c=>`<div class="row-card">
+    <div class="rc-front ${CJK.test(c.front)?'cjk':''}">${esc(c.front)}</div>
+    <div class="rc-back"><div class="m">${esc(c.mean)||'<span style=\"color:var(--text2)\">—</span>'}</div>${c.ex?`<div class="e">${esc(c.ex)}</div>`:''}</div>
+    <div class="rc-acts">
+      <button class="icon-btn" onclick="speak(${aq(c.front)}, ${aq(d.lang||'')})" title="読み上げ">🔊</button>
+      <button class="icon-btn" onclick="editCardPrompt('${c.id}')" title="編集">✎</button>
+      <button class="icon-btn del" onclick="deleteCard('${c.id}', true)" title="削除">🗑</button>
+    </div>
+  </div>`).join('') || '<div style="font-size:13px;color:var(--text2);text-align:center;padding:20px">該当するカードがありません</div>';
+}
+function editCardPrompt(id){
+  const d=curDeck(); const c=d.cards.find(x=>x.id===id); if(!c) return;
+  const front=prompt('単語（表）：', c.front); if(front===null) return;
+  const mean=prompt('意味：', c.mean); if(mean===null) return;
+  const ex=prompt('例文・メモ：', c.ex||''); if(ex===null) return;
+  c.front=front.trim(); c.mean=mean.trim(); c.ex=ex.trim(); save();
+  toast('更新しました ✓');
+  if(mode==='list') renderListRows(); else if(mode==='study') renderCard();
+  renderSidebar();
+}
+function deleteCard(id, fromList){
+  const d=curDeck(); d.cards=d.cards.filter(c=>c.id!==id); save();
+  toast('削除しました'); buildQueue(); renderSidebar();
+  if(mode==='list') renderListRows(); else if(mode==='add') renderRecent(); else if(mode==='study') renderCard();
+}
+function exportCsv(){
+  const d=curDeck();
+  const q=s=>{ s=s==null?'':String(s); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const csv='﻿'+'単語,意味,例文\n'+ d.cards.map(c=>[q(c.front),q(c.mean),q(c.ex)].join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=(d.name||'flashcards').replace(/[^\w　-鿿]+/g,'_')+'.csv'; a.click();
+  toast('CSVを書き出しました ⬆');
+}
+
+// ─────────── DECK MGMT ───────────
+function openNewDeck(){ editingDeckId=null; document.getElementById('dm-title').textContent='新しいデッキ'; document.getElementById('dm-name').value=''; document.getElementById('dm-lang').value=''; document.getElementById('deck-modal').classList.add('show'); setTimeout(()=>document.getElementById('dm-name').focus(),50); }
+function closeDeckModal(){ document.getElementById('deck-modal').classList.remove('show'); }
+function saveDeck(){
+  const name=document.getElementById('dm-name').value.trim(); if(!name){ toast('デッキ名を入力してください'); return; }
+  const lang=document.getElementById('dm-lang').value;
+  if(editingDeckId){ const d=decks.find(x=>x.id===editingDeckId); d.name=name; d.lang=lang; }
+  else { const d={ id:'d'+Date.now(), name, lang, cards:[] }; decks.push(d); curDeckId=d.id; }
+  save(); closeDeckModal(); renderSidebar(); setMode(mode);
+}
+function deleteDeck(id){
+  if(decks.length<=1){ toast('最後のデッキは削除できません'); return; }
+  const d=decks.find(x=>x.id===id);
+  if(!confirm(`デッキ「${d.name}」とその ${d.cards.length} 枚のカードを削除しますか？`)) return;
+  decks=decks.filter(x=>x.id!==id);
+  if(curDeckId===id) curDeckId=decks[0].id;
+  save(); session.finished=false; buildQueue(); renderSidebar(); setMode(mode);
+}
+
+// keyboard shortcuts for study
+document.addEventListener('keydown', e=>{
+  if(mode!=='study') return;
+  if(document.querySelector('.modal-bg.show')) return;
+  const tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea') return;
+  if(e.code==='Space'){ e.preventDefault(); if(session.idx<session.queue.length && !session.finished) flipCard(); }
+  else if(session.flipped && (e.key==='1'||e.key==='j')){ grade(false); }
+  else if(session.flipped && (e.key==='2'||e.key==='k')){ grade(true); }
+});
+
+// init
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged=()=>{}; }
+renderSidebar(); buildQueue(); setMode('study');
+</script>
+</body>
+</html>
