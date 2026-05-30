@@ -28,10 +28,12 @@ button, input, textarea, select { font-family:inherit; color:inherit; }
 .topbar { background:var(--bg1); border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 22px; gap:18px; height:58px; position:sticky; top:0; z-index:50; }
 .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:17px; color:var(--gold); letter-spacing:-0.02em; white-space:nowrap; }
 .logo em { color:var(--text1); font-style:normal; font-weight:400; font-size:11px; margin-left:10px; }
+@media (max-width:640px){ .logo em { display:none; } .logo { font-size:14px; } }
 .spacer { flex:1; }
-.gear { background:var(--bg2); border:1px solid var(--line2); color:var(--text1); width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:16px; display:inline-flex; align-items:center; justify-content:center; }
+.gear { background:var(--bg2); border:1px solid var(--line2); color:var(--text1); height:36px; padding:0 12px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:500; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+.gear .gi { font-size:15px; }
 .gear:hover { border-color:var(--gold); color:var(--gold); }
-.gear.warn { border-color:var(--red); color:var(--red); animation:pulse 1.8s ease-in-out infinite; }
+.gear.warn { border-color:var(--red); color:var(--red); background:var(--red-bg); animation:pulse 1.8s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity:0.55; } }
 
 /* layout */
@@ -177,6 +179,13 @@ textarea.input { resize:vertical; min-height:80px; font-family:'JetBrains Mono',
 /* toast */
 .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--line2); color:var(--text0); padding:10px 18px; border-radius:99px; font-size:13px; z-index:200; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
 
+/* api key banner */
+.kbanner { background:linear-gradient(135deg, rgba(212,91,91,0.12), rgba(212,168,67,0.08)); border:1px solid rgba(212,91,91,0.35); border-radius:var(--r2); padding:18px 22px; margin-bottom:22px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.kbanner .ki { font-size:24px; }
+.kbanner .kt { flex:1; min-width:200px; }
+.kbanner .kt strong { display:block; font-size:14px; font-weight:600; color:var(--text0); margin-bottom:3px; }
+.kbanner .kt span { font-size:12.5px; color:var(--text1); line-height:1.55; }
+
 /* empty state */
 .empty-big { text-align:center; padding:60px 20px; color:var(--text2); }
 .empty-big .em { font-size:38px; margin-bottom:14px; color:var(--bg4); }
@@ -187,7 +196,7 @@ textarea.input { resize:vertical; min-height:80px; font-family:'JetBrains Mono',
 <div class="topbar">
   <div class="logo">Bass Progression Analyzer<em>コード進行で曲を読む</em></div>
   <div class="spacer"></div>
-  <button class="gear" id="gear-btn" onclick="openSettings()" title="設定">⚙</button>
+  <button class="gear" id="gear-btn" onclick="openSettings()" title="API キー設定"><span class="gi">⚙</span><span id="gear-label">設定</span></button>
 </div>
 
 <div class="app">
@@ -200,6 +209,8 @@ textarea.input { resize:vertical; min-height:80px; font-family:'JetBrains Mono',
   <main class="main">
     <h1 class="page-h" id="page-h">コード進行を解析する</h1>
     <p class="page-sub" id="page-sub">ベース練習中に「この進行、前にも弾いた気がする」を確信に変えるツール。コードを貼るか曲名を入れるだけで、キー・ローマ数字・進行パターン・なぜ気持ちいいか・類似曲・ベースのヒントを返す。</p>
+
+    <div id="key-banner"></div>
 
     <div class="input-card" id="input-card">
       <div class="tabs">
@@ -337,7 +348,20 @@ function saveSettings(){
   closeSettings();
   toast(apiKey ? 'APIキーを保存しました' : 'APIキーをクリアしました');
 }
-function refreshGear(){ document.getElementById('gear-btn').classList.toggle('warn', !apiKey); }
+function refreshGear(){
+  document.getElementById('gear-btn').classList.toggle('warn', !apiKey);
+  const lbl = document.getElementById('gear-label');
+  if(lbl) lbl.textContent = apiKey ? '設定' : 'API キー未設定';
+  const bn = document.getElementById('key-banner');
+  if(bn){
+    bn.innerHTML = apiKey ? '' : `
+      <div class="kbanner">
+        <div class="ki">🔑</div>
+        <div class="kt"><strong>API キーが未設定です</strong><span>解析を実行するには Anthropic（Claude）の API キーが必要です。下のボタンから設定してください。キーはブラウザ内（localStorage）にだけ保存され、サーバーには送信されません。</span></div>
+        <button class="btn btn-gold" onclick="openSettings()">API キーを設定する</button>
+      </div>`;
+  }
+}
 
 // ════════ MODE ════════
 function setMode(m){
