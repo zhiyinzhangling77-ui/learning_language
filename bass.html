@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bass Progression Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg0:#09090b; --bg1:#111114; --bg2:#18181c; --bg3:#222228; --bg4:#2a2a32;
+  --line:rgba(255,255,255,0.07); --line2:rgba(255,255,255,0.12);
+  --text0:#f4f1ec; --text1:#a8a39a; --text2:#5e5a55;
+  --gold:#d4a843; --gold2:#f0c870; --gold-bg:rgba(212,168,67,0.1);
+  --green:#3dba7a; --green-bg:rgba(61,186,122,0.1);
+  --blue:#5b9bd4; --blue-bg:rgba(91,155,212,0.1);
+  --red:#d45b5b; --red-bg:rgba(212,91,91,0.1);
+  --purple:#9b7dd4; --purple-bg:rgba(155,125,212,0.1);
+  --r:10px; --r2:14px;
+}
+body { background:var(--bg0); color:var(--text0); font-family:'Inter',sans-serif; font-size:14px; min-height:100vh; }
+button, input, textarea, select { font-family:inherit; color:inherit; }
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:99px; }
+::-webkit-scrollbar-thumb:hover { background:var(--bg4); }
+
+/* topbar */
+.topbar { background:var(--bg1); border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 22px; gap:18px; height:58px; position:sticky; top:0; z-index:50; }
+.logo { font-family:'Syne',sans-serif; font-weight:800; font-size:17px; color:var(--gold); letter-spacing:-0.02em; white-space:nowrap; }
+.logo em { color:var(--text1); font-style:normal; font-weight:400; font-size:11px; margin-left:10px; }
+.spacer { flex:1; }
+.gear { background:var(--bg2); border:1px solid var(--line2); color:var(--text1); width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:16px; display:inline-flex; align-items:center; justify-content:center; }
+.gear:hover { border-color:var(--gold); color:var(--gold); }
+.gear.warn { border-color:var(--red); color:var(--red); animation:pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity:0.55; } }
+
+/* layout */
+.app { display:grid; grid-template-columns:280px 1fr; min-height:calc(100vh - 58px); }
+.side { background:var(--bg1); border-right:1px solid var(--line); padding:18px 16px; overflow-y:auto; max-height:calc(100vh - 58px); position:sticky; top:58px; }
+.main { padding:28px 32px 80px; max-width:980px; }
+@media (max-width:900px){ .app{grid-template-columns:1fr;} .side{position:static; max-height:none; border-right:none; border-bottom:1px solid var(--line);} .main{padding:20px 16px 80px;} }
+
+/* sidebar */
+.sec-label { font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text2); margin:6px 4px 10px; display:flex; align-items:center; gap:6px; }
+.sec-label .pill { background:var(--bg3); color:var(--text1); border-radius:99px; padding:1px 7px; font-size:9px; font-weight:600; }
+.btn-new { width:100%; background:var(--gold-bg); border:1px solid rgba(212,168,67,0.35); color:var(--gold); padding:10px 12px; border-radius:var(--r); font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:18px; }
+.btn-new:hover { background:rgba(212,168,67,0.18); }
+.hcard { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:11px 12px; margin-bottom:7px; cursor:pointer; transition:all 0.15s; }
+.hcard:hover { border-color:var(--line2); background:var(--bg3); }
+.hcard.active { border-color:var(--gold); background:var(--gold-bg); }
+.hcard .ht { font-size:13px; font-weight:500; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hcard .hr { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); letter-spacing:0.04em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hcard .hk { font-size:10px; color:var(--text2); margin-top:2px; }
+.hcard .hdel { float:right; background:none; border:none; color:var(--text2); cursor:pointer; font-size:13px; padding:0 2px; }
+.hcard .hdel:hover { color:var(--red); }
+.empty-mini { font-size:11px; color:var(--text2); padding:10px 4px; line-height:1.5; }
+
+/* main */
+h1.page-h { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin-bottom:6px; }
+.page-sub { font-size:13px; color:var(--text1); margin-bottom:22px; line-height:1.6; }
+
+/* input card */
+.input-card { background:var(--bg1); border:1px solid var(--line); border-radius:var(--r2); padding:20px; margin-bottom:24px; }
+.tabs { display:flex; gap:6px; margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:14px; }
+.tab { background:var(--bg2); border:1px solid var(--line); color:var(--text1); padding:7px 14px; border-radius:99px; font-size:12.5px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px; }
+.tab.on { background:var(--gold-bg); color:var(--gold); border-color:rgba(212,168,67,0.35); }
+.tab:hover { color:var(--text0); }
+.tab.on:hover { color:var(--gold); }
+.lbl { font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text2); margin-bottom:8px; display:block; }
+.input { width:100%; background:var(--bg2); border:1px solid var(--line2); border-radius:var(--r); padding:12px 14px; font-size:14px; color:var(--text0); }
+.input:focus { outline:none; border-color:var(--gold); }
+textarea.input { resize:vertical; min-height:80px; font-family:'JetBrains Mono',monospace; font-size:15px; line-height:1.6; letter-spacing:0.02em; }
+.row { display:flex; gap:12px; align-items:end; margin-top:14px; flex-wrap:wrap; }
+.row > * { flex:1; min-width:160px; }
+.row .grow0 { flex:0 0 auto; min-width:0; }
+.hint { font-size:11.5px; color:var(--text2); margin-top:6px; line-height:1.55; }
+.hint code { font-family:'JetBrains Mono',monospace; background:var(--bg3); color:var(--gold2); padding:1px 5px; border-radius:4px; font-size:11px; }
+.btn { padding:11px 18px; border-radius:var(--r); font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; display:inline-flex; align-items:center; gap:7px; transition:all 0.15s; }
+.btn-gold { background:var(--gold); color:#1a1408; border-color:var(--gold); }
+.btn-gold:hover:not(:disabled) { background:var(--gold2); }
+.btn-gold:disabled { opacity:0.45; cursor:not-allowed; }
+.btn-ghost { background:var(--bg2); color:var(--text1); border-color:var(--line2); }
+.btn-ghost:hover { color:var(--gold); border-color:var(--gold); }
+.btn-mini { padding:5px 10px; font-size:11.5px; border-radius:7px; }
+.actions { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+
+/* result */
+.result { display:flex; flex-direction:column; gap:18px; }
+.card { background:var(--bg1); border:1px solid var(--line); border-radius:var(--r2); padding:22px 24px; }
+.card-h { font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--gold); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.card-h .ic { font-size:13px; }
+
+/* key badge */
+.key-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.key-badge { font-family:'Syne',sans-serif; font-size:28px; font-weight:700; color:var(--gold); }
+.key-mode { font-size:13px; color:var(--text1); font-weight:400; margin-left:4px; }
+.key-reason { font-size:12.5px; color:var(--text1); flex:1; min-width:200px; line-height:1.55; }
+
+/* roman display */
+.prog-wrap { background:linear-gradient(180deg, rgba(212,168,67,0.04), transparent); border-radius:var(--r); padding:24px 16px; }
+.prog-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(86px, 1fr)); gap:10px; }
+.chord-cell { background:var(--bg2); border:1px solid var(--line2); border-radius:var(--r); padding:16px 8px 14px; text-align:center; }
+.chord-cell .roman { font-family:'Syne',sans-serif; font-size:26px; font-weight:700; color:var(--gold); margin-bottom:4px; line-height:1; }
+.chord-cell .actual { font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--text0); font-weight:500; }
+.chord-cell .note { font-size:10px; color:var(--text2); margin-top:5px; letter-spacing:0.04em; text-transform:uppercase; }
+.chord-cell.active { border-color:var(--gold); background:var(--gold-bg); box-shadow:0 0 0 1px var(--gold); }
+
+/* tags */
+.tag-row { display:flex; flex-wrap:wrap; gap:7px; margin-top:6px; }
+.tag { font-size:11.5px; padding:4px 10px; border-radius:99px; border:1px solid; font-weight:500; }
+.tag.gold { color:var(--gold); border-color:rgba(212,168,67,0.35); background:var(--gold-bg); }
+.tag.green { color:var(--green); border-color:rgba(61,186,122,0.35); background:var(--green-bg); }
+.tag.blue { color:var(--blue); border-color:rgba(91,155,212,0.35); background:var(--blue-bg); }
+.tag.purple { color:var(--purple); border-color:rgba(155,125,212,0.35); background:var(--purple-bg); }
+.tag.red { color:var(--red); border-color:rgba(212,91,91,0.35); background:var(--red-bg); }
+
+/* analysis paragraphs */
+.body-text { font-size:14px; line-height:1.75; color:var(--text0); }
+.body-text strong { color:var(--gold2); font-weight:600; }
+.body-text em { color:var(--text1); font-style:normal; }
+
+/* detected patterns list */
+.pat-list { display:flex; flex-direction:column; gap:10px; }
+.pat-item { background:var(--bg2); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:6px 10px 10px 6px; padding:11px 14px; }
+.pat-item .pn { font-size:13px; font-weight:600; color:var(--gold2); margin-bottom:3px; display:flex; align-items:center; gap:8px; }
+.pat-item .pw { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); background:var(--bg3); padding:1px 6px; border-radius:4px; font-weight:500; }
+.pat-item .pe { font-size:12.5px; color:var(--text1); line-height:1.6; }
+
+/* similar songs */
+.song-list { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:8px; }
+.song { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:10px 13px; }
+.song .st { font-size:13px; font-weight:500; }
+.song .sa { font-size:11.5px; color:var(--text1); margin-top:1px; }
+.song .ss { font-size:10.5px; color:var(--gold); margin-top:3px; letter-spacing:0.04em; text-transform:uppercase; }
+
+/* bass hints */
+.bass-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+.bh-block { background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:12px 14px; }
+.bh-label { font-size:10.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text2); margin-bottom:6px; }
+.bh-mono { font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--gold2); letter-spacing:0.04em; line-height:1.7; }
+.bh-text { font-size:13px; color:var(--text0); line-height:1.6; }
+
+/* transpose */
+.trans-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+.trans-bar .lbl { margin:0; }
+.key-pick { display:flex; flex-wrap:wrap; gap:5px; }
+.kp { background:var(--bg2); border:1px solid var(--line); color:var(--text1); padding:4px 9px; border-radius:6px; font-size:11.5px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-weight:500; }
+.kp:hover { color:var(--gold); border-color:var(--line2); }
+.kp.on { background:var(--gold-bg); color:var(--gold); border-color:var(--gold); }
+.trans-out { font-family:'JetBrains Mono',monospace; font-size:16px; color:var(--text0); background:var(--bg2); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; letter-spacing:0.04em; line-height:1.7; }
+.trans-out .small { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:5px; display:block; }
+
+/* player */
+.player { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.play-btn { width:48px; height:48px; border-radius:50%; background:var(--gold); color:#1a1408; border:none; cursor:pointer; font-size:18px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.play-btn:hover { background:var(--gold2); }
+.play-btn.stop { background:var(--bg3); color:var(--gold); border:1px solid var(--gold); }
+.bpm-block { display:flex; align-items:center; gap:10px; flex:1; min-width:200px; }
+.bpm-block input[type=range] { flex:1; accent-color:var(--gold); }
+.bpm-val { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--gold); width:54px; text-align:right; }
+.bpm-label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em; }
+
+/* modal */
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:100; padding:20px; }
+.modal-bg.show { display:flex; }
+.modal { background:var(--bg1); border:1px solid var(--line2); border-radius:var(--r2); padding:24px; max-width:480px; width:100%; }
+.modal h3 { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:6px; }
+.modal p { font-size:12.5px; color:var(--text1); margin-bottom:14px; line-height:1.6; }
+.modal a { color:var(--gold); text-decoration:none; }
+.modal a:hover { text-decoration:underline; }
+
+/* loading */
+.loading { display:flex; align-items:center; gap:10px; color:var(--text1); font-size:13px; padding:24px 0; justify-content:center; }
+.spinner { width:14px; height:14px; border:2px solid var(--bg3); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* toast */
+.toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--bg3); border:1px solid var(--line2); color:var(--text0); padding:10px 18px; border-radius:99px; font-size:13px; z-index:200; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
+
+/* empty state */
+.empty-big { text-align:center; padding:60px 20px; color:var(--text2); }
+.empty-big .em { font-size:38px; margin-bottom:14px; color:var(--bg4); }
+.empty-big .et { font-size:14px; color:var(--text1); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">Bass Progression Analyzer<em>コード進行で曲を読む</em></div>
+  <div class="spacer"></div>
+  <button class="gear" id="gear-btn" onclick="openSettings()" title="設定">⚙</button>
+</div>
+
+<div class="app">
+  <aside class="side">
+    <button class="btn-new" onclick="newAnalysis()">＋ 新しい解析</button>
+    <div class="sec-label">履歴 <span class="pill" id="hist-count">0</span></div>
+    <div id="hist-list"></div>
+  </aside>
+
+  <main class="main">
+    <h1 class="page-h" id="page-h">コード進行を解析する</h1>
+    <p class="page-sub" id="page-sub">ベース練習中に「この進行、前にも弾いた気がする」を確信に変えるツール。コードを貼るか曲名を入れるだけで、キー・ローマ数字・進行パターン・なぜ気持ちいいか・類似曲・ベースのヒントを返す。</p>
+
+    <div class="input-card" id="input-card">
+      <div class="tabs">
+        <div class="tab on" id="tab-chords" onclick="setMode('chords')">🎹 コードを貼る</div>
+        <div class="tab" id="tab-song" onclick="setMode('song')">🎵 曲名で推定</div>
+      </div>
+
+      <div id="mode-chords">
+        <label class="lbl">コード進行</label>
+        <textarea class="input" id="in-chords" placeholder="C  G  Am  F&#10;Dm7  G7  Cmaj7&#10;または　C - G - Am - F"></textarea>
+        <div class="hint">スペース・カンマ・<code>-</code>・改行で区切り。<code>C/E</code> や <code>Cmaj7</code> <code>Dm7</code> <code>G7sus4</code> <code>F#m7b5</code> なども OK。</div>
+
+        <div class="row">
+          <div class="grow0" style="min-width:0;">
+            <label class="lbl">キー（任意）</label>
+            <select class="input" id="in-key" style="min-width:140px;">
+              <option value="">自動推定</option>
+              <optgroup label="major">
+                <option>C major</option><option>G major</option><option>D major</option><option>A major</option><option>E major</option><option>B major</option><option>F# major</option>
+                <option>F major</option><option>Bb major</option><option>Eb major</option><option>Ab major</option><option>Db major</option><option>Gb major</option>
+              </optgroup>
+              <optgroup label="minor">
+                <option>A minor</option><option>E minor</option><option>B minor</option><option>F# minor</option><option>C# minor</option><option>G# minor</option>
+                <option>D minor</option><option>G minor</option><option>C minor</option><option>F minor</option><option>Bb minor</option><option>Eb minor</option>
+              </optgroup>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">セクション（任意）</label>
+            <select class="input" id="in-section">
+              <option value="">指定なし</option>
+              <option>verse</option><option>chorus / サビ</option><option>bridge</option><option>intro</option><option>outro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="mode-song" style="display:none;">
+        <label class="lbl">曲名 / アーティスト</label>
+        <input class="input" id="in-song" placeholder="例：Let It Be / The Beatles　または　Lemon / 米津玄師（サビ）" />
+        <div class="hint">AI が記憶している範囲で進行を推定します。マイナー曲や新しい曲は外す可能性あり。コードが分かっているなら左タブが確実。</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-gold" id="btn-analyze" onclick="analyze()">⚡ 解析する</button>
+        <button class="btn btn-ghost" onclick="loadSample()">サンプルを入れる</button>
+      </div>
+    </div>
+
+    <div id="result"></div>
+  </main>
+</div>
+
+<div class="modal-bg" id="settings-modal">
+  <div class="modal">
+    <h3>API キー設定</h3>
+    <p>Anthropic（Claude）の API キーを入力してください。キーはこのブラウザ内（localStorage）にのみ保存されます。サーバーには送信しません。<br>
+    取得：<a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a></p>
+    <input class="input" id="set-key" type="password" placeholder="sk-ant-..." />
+    <div style="margin-top:10px;">
+      <label class="lbl">モデル</label>
+      <select class="input" id="set-model">
+        <option value="claude-sonnet-4-6">claude-sonnet-4-6（推奨・速い）</option>
+        <option value="claude-opus-4-7">claude-opus-4-7（深い分析）</option>
+        <option value="claude-haiku-4-5-20251001">claude-haiku-4-5（軽量）</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:18px; justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeSettings()">キャンセル</button>
+      <button class="btn btn-gold" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════ STATE ════════
+let apiKey = localStorage.getItem('bass_key') || localStorage.getItem('zh_key') || localStorage.getItem('coach_key') || '';
+let model  = localStorage.getItem('bass_model') || 'claude-sonnet-4-6';
+let mode = 'chords';
+let history = JSON.parse(localStorage.getItem('bass_history') || '[]');
+let current = null;       // 現在表示中の解析結果
+let activeId = null;      // 履歴ID
+let transposeKey = null;  // 現在の転調先 (e.g. "G major")
+
+// ════════ UTIL ════════
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function toast(m){ const e=document.createElement('div'); e.className='toast'; e.textContent=m; document.body.appendChild(e); setTimeout(()=>e.remove(),2400); }
+function persist(){ localStorage.setItem('bass_history', JSON.stringify(history.slice(0,80))); }
+
+// ════════ CLAUDE ════════
+async function callClaude({system, messages, max_tokens=2200}){
+  if(!apiKey) throw new Error('APIキー未設定（右上の⚙）');
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify({ model, max_tokens, system, messages })
+  });
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error?.message || ('HTTP '+r.status)); }
+  const d = await r.json();
+  return d.content.map(c=>c.text||'').join('');
+}
+function parseJson(raw){
+  let s = raw.replace(/```json|```/g,'').trim();
+  const i = s.search(/[\[{]/); if(i>=0) s = s.slice(i);
+  let depth=0, last=-1, inStr=false, escp=false;
+  for(let k=0;k<s.length;k++){ const c=s[k];
+    if(inStr){ if(escp){escp=false;continue;} if(c==='\\'){escp=true;continue;} if(c==='"'){inStr=false;continue;} continue; }
+    if(c==='"'){inStr=true;continue;}
+    if(c==='{'||c==='[') depth++;
+    else if(c==='}'||c===']'){ depth--; if(depth===0) last=k; }
+  }
+  if(last>=0) s = s.slice(0,last+1);
+  return JSON.parse(s);
+}
+
+// ════════ SETTINGS ════════
+function openSettings(){
+  document.getElementById('set-key').value = apiKey;
+  document.getElementById('set-model').value = model;
+  document.getElementById('settings-modal').classList.add('show');
+}
+function closeSettings(){ document.getElementById('settings-modal').classList.remove('show'); }
+function saveSettings(){
+  apiKey = document.getElementById('set-key').value.trim();
+  model  = document.getElementById('set-model').value;
+  localStorage.setItem('bass_key', apiKey);
+  localStorage.setItem('bass_model', model);
+  refreshGear();
+  closeSettings();
+  toast(apiKey ? 'APIキーを保存しました' : 'APIキーをクリアしました');
+}
+function refreshGear(){ document.getElementById('gear-btn').classList.toggle('warn', !apiKey); }
+
+// ════════ MODE ════════
+function setMode(m){
+  mode = m;
+  document.getElementById('tab-chords').classList.toggle('on', m==='chords');
+  document.getElementById('tab-song').classList.toggle('on', m==='song');
+  document.getElementById('mode-chords').style.display = m==='chords' ? 'block' : 'none';
+  document.getElementById('mode-song').style.display   = m==='song'   ? 'block' : 'none';
+}
+function loadSample(){
+  if(mode==='chords'){
+    document.getElementById('in-chords').value = 'C  G  Am  F';
+    document.getElementById('in-key').value = '';
+    document.getElementById('in-section').value = 'chorus / サビ';
+  } else {
+    document.getElementById('in-song').value = 'Let It Be / The Beatles（サビ）';
+  }
+}
+
+// ════════ ANALYZE ════════
+const SYSTEM_PROMPT = `あなたはベース奏者と作曲家のための音楽理論コーチです。コード進行を見て、キー、ローマ数字、進行パターン、なぜ気持ちいいか、類似曲、ベース奏者向けのヒントを返します。出力は厳密な JSON のみ（前後に説明文を入れない）。日本語で書いてください。`;
+
+function buildUserPrompt(){
+  if(mode==='chords'){
+    const chords = document.getElementById('in-chords').value.trim();
+    const key    = document.getElementById('in-key').value.trim();
+    const sect   = document.getElementById('in-section').value.trim();
+    if(!chords) throw new Error('コードを入力してください');
+    return {
+      label: chords.split(/\s+|[-,|]+/).filter(Boolean).join(' '),
+      prompt: `入力されたコード進行を解析してください。
+
+【コード】
+${chords}
+
+【ユーザー指定キー】${key || '（未指定 → 自動推定）'}
+【セクション】${sect || '（未指定）'}
+
+次の JSON 形式で厳密に返してください：
+{
+  "title": "曲名が分かれば書く（不明なら "${chords.split(/\\s+/).slice(0,4).join(' ')}" のように進行をタイトル化）",
+  "section": "verse / chorus / bridge / intro / outro / unknown",
+  "key": "C major のような形式",
+  "key_reasoning": "なぜそのキーと判断したか1-2文",
+  "chords": ["C", "G", "Am", "F"],   // 入力を正規化（大文字/小文字、品質を含む）
+  "roman": ["I", "V", "vi", "IV"],   // 同じ長さでローマ数字（小文字=minor、♭III, V7, viiø, ii°, V/ii 等を許可）
+  "function": ["T","D","S","T"],     // T=tonic S=subdominant D=dominant SD=secondary dominant BR=borrowed MOD=modulation
+  "tags": ["王道進行","pop-canon"],  // 3-6個のタグ
+  "patterns_detected": [
+    { "name": "I-V-vi-IV (王道進行)", "where": "全体", "explain": "60s以降のポップスで最も使われる進行..." }
+  ],
+  "why_it_sounds_good": "音楽的に何が起こって聴き手にどう響くか、3-5文で。専門用語は使うが噛み砕いて。",
+  "similar_songs": [
+    { "title": "Let It Be", "artist": "The Beatles", "section": "verse", "note": "ほぼ同一進行" }
+  ],
+  "bass_hints": {
+    "root_notes": ["C","G","A","F"],
+    "walking_example": "C-E-G-B | G-B-D-F | A-C-E-G | F-A-C-E",
+    "groove_tip": "4分でルートを刻むだけでも成立する進行。慣れたら3拍目を5度に置き換えて...",
+    "common_mistake": "Am に行く時に F# を弾いてしまう人が多いが C メジャーキーなので F natural が正解"
+  },
+  "practice_focus": "この進行で身につくこと（1-2文）"
+}
+
+重要：
+- ローマ数字は大文字=メジャー、小文字=マイナーの慣習。dim は °、half-dim は ø、♭ や ♯ を使う。
+- セカンダリードミナントは V/ii, V/V のように書く。
+- 借用和音は ♭VII, iv, ♭III のように明示。
+- 類似曲は実在の有名曲を 3-6 個、できれば異ジャンルから。`
+    };
+  } else {
+    const song = document.getElementById('in-song').value.trim();
+    if(!song) throw new Error('曲名を入力してください');
+    return {
+      label: song,
+      prompt: `次の曲のコード進行を解析してください。曲名から記憶している進行を推定し、不明な場合は最も有名なセクション（通常はサビ）を選ぶ。
+
+【曲】${song}
+
+次の JSON 形式で厳密に返してください：
+{
+  "title": "${song.replace(/\"/g,'\\"')}",
+  "section": "解析対象のセクション (verse / chorus / bridge など)",
+  "key": "C major のような形式",
+  "key_reasoning": "なぜそのキーと判断したか1-2文",
+  "chords": ["C", "G", "Am", "F"],
+  "roman": ["I", "V", "vi", "IV"],
+  "function": ["T","D","S","T"],
+  "tags": ["王道進行"],
+  "patterns_detected": [
+    { "name": "I-V-vi-IV", "where": "全体", "explain": "..." }
+  ],
+  "why_it_sounds_good": "...",
+  "similar_songs": [
+    { "title": "...", "artist": "...", "section": "...", "note": "..." }
+  ],
+  "bass_hints": {
+    "root_notes": ["C","G","A","F"],
+    "walking_example": "...",
+    "groove_tip": "...",
+    "common_mistake": "..."
+  },
+  "practice_focus": "...",
+  "confidence": "high / medium / low（記憶の確度）",
+  "uncertainty_note": "曲が特定できない・進行が分からない場合の注記（無ければ空文字）"
+}
+
+ローマ数字の表記規則は通常通り（大文字=major、小文字=minor、°=dim、ø=half-dim、♭/♯ を含めて良い、V/ii 等のセカンダリードミナントも可）。類似曲は実在の有名曲を 3-6 個。`
+    };
+  }
+}
+
+async function analyze(){
+  if(!apiKey){ openSettings(); return; }
+  let req;
+  try { req = buildUserPrompt(); } catch(e){ toast(e.message); return; }
+
+  const btn = document.getElementById('btn-analyze');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 解析中…';
+  document.getElementById('result').innerHTML = '<div class="loading"><span class="spinner"></span> Claude が進行を読み解いています…</div>';
+
+  try {
+    const raw = await callClaude({
+      system: SYSTEM_PROMPT,
+      messages: [{ role:'user', content: req.prompt }],
+      max_tokens: 2400
+    });
+    const data = parseJson(raw);
+    current = { id: uid(), label: req.label, mode, data, savedAt: Date.now() };
+    transposeKey = null;
+    history.unshift(current); activeId = current.id; persist();
+    renderHistory(); renderResult();
+  } catch(e){
+    document.getElementById('result').innerHTML = `<div class="card"><div class="card-h">⚠ エラー</div><div class="body-text">${esc(e.message)}</div></div>`;
+  } finally {
+    btn.disabled = false; btn.innerHTML = '⚡ 解析する';
+  }
+}
+
+// ════════ TRANSPOSE ════════
+const NOTES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NOTES_FLAT  = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+const FLAT_KEYS = new Set(['F','Bb','Eb','Ab','Db','Gb','Cb','D minor','G minor','C minor','F minor','Bb minor','Eb minor','Ab minor']);
+
+function parseNote(n){
+  const m = String(n).match(/^([A-G])([#b]?)/);
+  if(!m) return -1;
+  const base = {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]];
+  return ( base + (m[2]==='#'?1:m[2]==='b'?-1:0) + 120 ) % 12;
+}
+function keyTonic(key){
+  const m = String(key).match(/^([A-G][#b]?)/);
+  return m ? parseNote(m[1]) : 0;
+}
+function useFlats(key){
+  const m = String(key).match(/^([A-G][#b]?)\s*(major|minor)?/i);
+  if(!m) return false;
+  const tonic = m[1];
+  const mode = (m[2]||'major').toLowerCase();
+  return FLAT_KEYS.has(tonic) || FLAT_KEYS.has(tonic+' '+mode);
+}
+function transposeChord(chord, semis, targetUsesFlat){
+  const m = String(chord).match(/^([A-G])([#b]?)(.*)$/);
+  if(!m) return chord;
+  const rootIdx = ( parseNote(m[1]+m[2]) + semis + 120 ) % 12;
+  const rootStr = targetUsesFlat ? NOTES_FLAT[rootIdx] : NOTES_SHARP[rootIdx];
+  let rest = m[3];
+  // bass / slash chord
+  const sl = rest.match(/^(.*)\/([A-G])([#b]?)(.*)$/);
+  if(sl){
+    const bassIdx = (parseNote(sl[2]+sl[3]) + semis + 120) % 12;
+    const bassStr = targetUsesFlat ? NOTES_FLAT[bassIdx] : NOTES_SHARP[bassIdx];
+    rest = sl[1] + '/' + bassStr + sl[4];
+  }
+  return rootStr + rest;
+}
+function transposeAll(chords, fromKey, toKey){
+  const semis = ( keyTonic(toKey) - keyTonic(fromKey) + 120 ) % 12;
+  const flat = useFlats(toKey);
+  return chords.map(c=>transposeChord(c, semis, flat));
+}
+
+// ════════ AUDIO PLAYER ════════
+let audioCtx = null, playTimer = null, playing = false, currentBpm = 90, playIdx = 0;
+function ensureCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function rootHz(note){
+  // bass octave: E1 ≈ 41.2 Hz. Use note in octave 2 for clarity.
+  const idx = parseNote(note); if(idx<0) return 110;
+  const a4 = 440;
+  // semitones from A4: idx is from C=0..B=11; A is 9
+  // pick octave 2 (two below A3): A2 = 110 Hz
+  const semisFromA2 = idx - 9; // 0=A2
+  return 110 * Math.pow(2, semisFromA2/12);
+}
+function playNote(freq, when, dur){
+  const ctx = ensureCtx();
+  const o = ctx.createOscillator(); const g = ctx.createGain();
+  o.type = 'triangle'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(0.22, when+0.01);
+  g.gain.exponentialRampToValueAtTime(0.001, when+dur);
+  o.connect(g).connect(ctx.destination);
+  o.start(when); o.stop(when+dur+0.05);
+}
+function playClick(when){
+  const ctx = ensureCtx();
+  const o = ctx.createOscillator(); const g = ctx.createGain();
+  o.type='square'; o.frequency.value=1800;
+  g.gain.setValueAtTime(0.06, when);
+  g.gain.exponentialRampToValueAtTime(0.0001, when+0.04);
+  o.connect(g).connect(ctx.destination);
+  o.start(when); o.stop(when+0.05);
+}
+function togglePlay(){
+  if(playing){ stopPlay(); return; }
+  if(!current) return;
+  const chords = currentChords();
+  if(!chords.length) return;
+  const ctx = ensureCtx(); if(ctx.state==='suspended') ctx.resume();
+  playing = true; playIdx = 0;
+  document.querySelector('.play-btn')?.classList.add('stop');
+  document.querySelector('.play-btn').textContent = '■';
+  const beatSec = 60 / currentBpm;
+  const barSec = beatSec * 4;
+  let nextTime = ctx.currentTime + 0.1;
+  function schedule(){
+    if(!playing) return;
+    const ch = chords[playIdx % chords.length];
+    const f = rootHz(ch);
+    // 4 beats per chord, click every beat, note on beat 1 (sustain through bar)
+    playNote(f, nextTime, barSec * 0.95);
+    for(let b=0;b<4;b++){ playClick(nextTime + b*beatSec); }
+    // highlight chord
+    const idxNow = playIdx % chords.length;
+    setTimeout(()=>highlightChord(idxNow), Math.max(0, (nextTime - ctx.currentTime)*1000));
+    nextTime += barSec;
+    playIdx++;
+    playTimer = setTimeout(schedule, barSec*1000 - 30);
+  }
+  schedule();
+}
+function stopPlay(){
+  playing = false;
+  if(playTimer){ clearTimeout(playTimer); playTimer=null; }
+  const b = document.querySelector('.play-btn');
+  if(b){ b.classList.remove('stop'); b.textContent='▶'; }
+  highlightChord(-1);
+}
+function highlightChord(i){
+  document.querySelectorAll('.chord-cell').forEach((el,k)=>el.classList.toggle('active', k===i));
+}
+function currentChords(){
+  if(!current) return [];
+  const d = current.data;
+  if(transposeKey && transposeKey !== d.key){
+    return transposeAll(d.chords||[], d.key, transposeKey);
+  }
+  return d.chords||[];
+}
+
+// ════════ RENDER ════════
+function newAnalysis(){
+  current=null; activeId=null; transposeKey=null; stopPlay();
+  document.getElementById('result').innerHTML='';
+  document.getElementById('in-chords').value=''; document.getElementById('in-song').value='';
+  document.getElementById('in-key').value=''; document.getElementById('in-section').value='';
+  renderHistory();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function loadFromHistory(id){
+  const h = history.find(x=>x.id===id); if(!h) return;
+  current = h; activeId = id; transposeKey = null; stopPlay();
+  renderHistory(); renderResult();
+  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function deleteFromHistory(id, ev){
+  ev.stopPropagation();
+  if(!confirm('この履歴を削除しますか？')) return;
+  history = history.filter(x=>x.id!==id); persist();
+  if(activeId===id){ current=null; activeId=null; document.getElementById('result').innerHTML=''; }
+  renderHistory();
+}
+function renderHistory(){
+  document.getElementById('hist-count').textContent = history.length;
+  const el = document.getElementById('hist-list');
+  if(!history.length){ el.innerHTML='<div class="empty-mini">まだ解析履歴がありません。<br>コードを貼って「解析する」を押すと、ここに溜まっていきます。</div>'; return; }
+  el.innerHTML = history.map(h=>`
+    <div class="hcard ${h.id===activeId?'active':''}" onclick="loadFromHistory('${h.id}')">
+      <button class="hdel" onclick="deleteFromHistory('${h.id}', event)" title="削除">×</button>
+      <div class="ht">${esc(h.data.title || h.label)}</div>
+      <div class="hr">${esc((h.data.roman||[]).join(' - '))}</div>
+      <div class="hk">${esc(h.data.key||'')} ${h.data.section ? '・ '+esc(h.data.section) : ''}</div>
+    </div>
+  `).join('');
+}
+
+function tagColor(t){
+  const s = String(t).toLowerCase();
+  if(/(王道|pop|canon|diatonic|i-v-vi|i-iv-v)/.test(s)) return 'gold';
+  if(/(ii-v-i|jazz|modal)/.test(s)) return 'blue';
+  if(/(借用|borrowed|modal mix|♭|b3|b6|b7)/.test(s)) return 'purple';
+  if(/(secondary|セカンダリ|v\/|tritone|chromatic)/.test(s)) return 'red';
+  if(/(転調|modulation|key change)/.test(s)) return 'green';
+  return 'gold';
+}
+
+function renderResult(){
+  if(!current){ document.getElementById('result').innerHTML=''; return; }
+  const d = current.data;
+  const displayChords = currentChords();
+  const displayKey = transposeKey || d.key;
+  const roman = d.roman || [];
+  const fn = d.function || [];
+  const tags = d.tags || [];
+  const pats = d.patterns_detected || [];
+  const songs = d.similar_songs || [];
+  const bh = d.bass_hints || {};
+  const conf = d.confidence;
+
+  const allKeys = ['C major','G major','D major','A major','E major','B major','F# major','F major','Bb major','Eb major','Ab major','Db major','A minor','E minor','B minor','F# minor','C# minor','D minor','G minor','C minor','F minor','Bb minor'];
+
+  const html = `
+    ${conf ? `<div class="hint" style="text-align:right; margin-top:-10px;">推定信頼度: <strong style="color:${conf==='high'?'var(--green)':conf==='low'?'var(--red)':'var(--gold)'}">${esc(conf)}</strong>${d.uncertainty_note?' ・ '+esc(d.uncertainty_note):''}</div>`:''}
+
+    <div class="card">
+      <div class="card-h">🎼 ${esc(d.title || current.label)} ${d.section?`<span class="tag gold" style="margin-left:6px;">${esc(d.section)}</span>`:''}</div>
+      <div class="key-row">
+        <div class="key-badge">${esc(displayKey)}${transposeKey?'<span class="key-mode"> （'+esc(d.key)+' から転調）</span>':''}</div>
+        <div class="key-reason">${esc(d.key_reasoning||'')}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">🎹 ローマ数字解析</div>
+      <div class="prog-wrap">
+        <div class="prog-grid">
+          ${displayChords.map((ch,i)=>`
+            <div class="chord-cell">
+              <div class="roman">${esc(roman[i]||'?')}</div>
+              <div class="actual">${esc(ch)}</div>
+              ${fn[i]?`<div class="note">${esc(fn[i])}</div>`:''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="tag-row" style="margin-top:18px;">
+        ${tags.map(t=>`<span class="tag ${tagColor(t)}">${esc(t)}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">🎧 ループ再生（ベース練習用）</div>
+      <div class="player">
+        <button class="play-btn" onclick="togglePlay()">▶</button>
+        <div class="bpm-block">
+          <span class="bpm-label">BPM</span>
+          <input type="range" min="40" max="200" value="${currentBpm}" oninput="setBpm(this.value)" />
+          <span class="bpm-val" id="bpm-val">${currentBpm}</span>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:10px;">各小節 4 拍。ルート音（triangle wave）＋クリック。上のコードカードが拍に合わせて光ります。コードチェンジを耳で覚えるための簡易メトロノーム。</div>
+    </div>
+
+    ${pats.length ? `
+    <div class="card">
+      <div class="card-h">🔍 検出した進行パターン</div>
+      <div class="pat-list">
+        ${pats.map(p=>`
+          <div class="pat-item">
+            <div class="pn">${esc(p.name||'')} ${p.where?`<span class="pw">${esc(p.where)}</span>`:''}</div>
+            <div class="pe">${esc(p.explain||'')}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="card">
+      <div class="card-h">💭 なぜ気持ちいいか</div>
+      <div class="body-text">${esc(d.why_it_sounds_good||'').replace(/\n/g,'<br>')}</div>
+      ${d.practice_focus?`<div class="hint" style="margin-top:14px; border-top:1px solid var(--line); padding-top:12px;"><strong style="color:var(--gold)">この進行で身につくこと：</strong> ${esc(d.practice_focus)}</div>`:''}
+    </div>
+
+    <div class="card">
+      <div class="card-h">🎸 ベース奏者のヒント</div>
+      <div class="bass-grid">
+        ${bh.root_notes ? `<div class="bh-block"><div class="bh-label">ルート音</div><div class="bh-mono">${esc(bh.root_notes.join(' → '))}</div></div>`:''}
+        ${bh.walking_example ? `<div class="bh-block"><div class="bh-label">ウォーキングライン例</div><div class="bh-mono">${esc(bh.walking_example)}</div></div>`:''}
+        ${bh.groove_tip ? `<div class="bh-block"><div class="bh-label">グルーヴのコツ</div><div class="bh-text">${esc(bh.groove_tip)}</div></div>`:''}
+        ${bh.common_mistake ? `<div class="bh-block" style="border-left:3px solid var(--red);"><div class="bh-label" style="color:var(--red);">よくあるミス</div><div class="bh-text">${esc(bh.common_mistake)}</div></div>`:''}
+      </div>
+    </div>
+
+    ${songs.length ? `
+    <div class="card">
+      <div class="card-h">📻 同じ進行の曲</div>
+      <div class="song-list">
+        ${songs.map(s=>`
+          <div class="song">
+            <div class="st">${esc(s.title||'')}</div>
+            <div class="sa">${esc(s.artist||'')}</div>
+            ${s.section?`<div class="ss">${esc(s.section)}${s.note?' ・ '+esc(s.note):''}</div>`:s.note?`<div class="ss">${esc(s.note)}</div>`:''}
+          </div>
+        `).join('')}
+      </div>
+    </div>`:''}
+
+    <div class="card">
+      <div class="card-h">🔁 別のキーで見る</div>
+      <div class="trans-bar">
+        <div class="key-pick">
+          ${allKeys.map(k=>`<button class="kp ${(transposeKey||d.key)===k?'on':''}" onclick="setTranspose('${k}')">${esc(k)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="trans-out">
+        <span class="small">${esc(transposeKey||d.key)}</span>
+        ${displayChords.map((c,i)=>`<span style="display:inline-block; min-width:60px;">${esc(c)}<span style="color:var(--text2); font-size:11px; margin-left:4px;">${esc(roman[i]||'')}</span></span>`).join('')}
+      </div>
+      <div class="hint" style="margin-top:10px;">同じ進行を別のキーで弾く練習に。指板の異なるポジションで同じ機能を捉えられるようになる。</div>
+    </div>
+  `;
+  document.getElementById('result').innerHTML = html;
+}
+
+function setTranspose(k){
+  if(!current) return;
+  transposeKey = (k===current.data.key) ? null : k;
+  stopPlay();
+  renderResult();
+}
+function setBpm(v){
+  currentBpm = parseInt(v,10);
+  document.getElementById('bpm-val').textContent = currentBpm;
+  if(playing){ stopPlay(); togglePlay(); }
+}
+
+// ════════ INIT ════════
+refreshGear();
+renderHistory();
+if(!apiKey){ setTimeout(()=>{ if(!apiKey) openSettings(); }, 400); }
+
+// Enter to analyze in song mode
+document.getElementById('in-song').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); analyze(); }
+});
+// Cmd/Ctrl+Enter in textarea
+document.getElementById('in-chords').addEventListener('keydown', e=>{
+  if(e.key==='Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); analyze(); }
+});
+</script>
+</body>
+</html>
