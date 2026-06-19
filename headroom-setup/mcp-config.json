@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "headroom": {
+      "command": "headroom",
+      "args": ["mcp", "serve"],
+      "env": {
+        "HEADROOM_OUTPUT_SHAPER": "1",
+        "HEADROOM_UPDATE_CHECK": "off"
+      }
+    }
+  }
+}
